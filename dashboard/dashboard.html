@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KisanMitra - Advisory डैशबोर्ड</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+  body { font-family: 'Public Sans', sans-serif; background: #f7fbf1; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .card { background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 20px; }
+  .pulse { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .fade-in { animation: fadeIn 0.5s ease-in; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .day-card { background:white; border-radius:16px; padding:12px; text-align:center; min-width:90px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="flex justify-between items-center h-16 px-6 w-full sticky top-0 z-50 bg-green-900 text-white shadow-lg">
+  <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+    <span class="text-2xl">🌾</span>
+    <div>
+      <div class="text-lg font-bold leading-tight">KisanMitra</div>
+      <div class="text-xs text-green-300 leading-tight">हर किसान का साथी</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-3">
+    <button onclick="refreshData()" class="p-2 hover:bg-green-800 rounded-full transition-colors" title="Refresh">
+      <span class="material-symbols-outlined" id="refresh-icon">refresh</span>
+    </button>
+    <button class="p-2 hover:bg-green-800 rounded-full transition-colors">
+      <span class="material-symbols-outlined">notifications</span>
+    </button>
+    <button class="p-2 hover:bg-green-800 rounded-full transition-colors">
+      <span class="material-symbols-outlined">account_circle</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Stats Bar -->
+<div class="bg-green-50 border-b border-green-100 px-6 py-2 flex items-center gap-6 text-sm text-gray-600">
+  <span>🕐 <span id="last-updated">Loading...</span></span>
+  <span>📍 <span id="location-display">--</span></span>
+  <span>🌾 <span id="crop-display">--</span></span>
+</div>
+
+<!-- Breadcrumb -->
+<div class="px-6 py-2 text-sm text-gray-500">
+  <span id="breadcrumb">Indore | Wheat-गेहूं | आज की सलाह</span>
+</div>
+
+<!-- Loading State -->
+<div id="loading-state" class="flex flex-col items-center justify-center py-20">
+  <div class="text-5xl mb-4 pulse">🌾</div>
+  <div class="text-green-800 font-semibold text-lg">मौसम की जानकारी ले रहे हैं...</div>
+  <div class="text-gray-500 text-sm mt-1">आपकी फसल के लिए सलाह तैयार हो रही है</div>
+</div>
+
+<!-- Main Content -->
+<div id="main-content" class="hidden px-4 pb-24 space-y-4 fade-in">
+
+  <!-- मौसम Card (Full Width) -->
+  <div class="card border-l-4 border-blue-500">
+    <div class="flex justify-between items-start">
+      <div class="flex-1">
+        <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-2">🌤️ आज का मौसम</div>
+        <div class="text-4xl font-bold text-gray-900 mb-3" id="weather-main-text">गर्मी अधिक रहेगी</div>
+        <div class="flex gap-3 flex-wrap mb-3">
+          <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-sm font-semibold" id="temp-display">🌡️ --°C</span>
+          <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-sm font-semibold" id="rain-display">🌧️ --mm</span>
+          <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-sm font-semibold" id="wind-display">💨 --km/h</span>
+        </div>
+        <div class="bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+          <span class="text-green-800 text-sm font-medium" id="weather-advisory-text">☀️ Loading advisory...</span>
+        </div>
+        <button onclick="toggleमौसमDetails()" class="text-blue-500 text-sm mt-2 hover:underline">और जानकारी →</button>
+        <div id="weather-details" class="hidden mt-2 text-sm text-gray-500 space-y-1">
+          <div>Min Temp: <span id="temp-min">--</span>°C | Max Temp: <span id="temp-max">--</span>°C</div>
+          <div>Rain Probability: <span id="rain-prob">--</span>%</div>
+        </div>
+      </div>
+      <div class="ml-4" style="width:260px;min-width:260px;max-width:260px">
+        <div class="text-xs text-gray-500 font-semibold mb-1 text-center">बारिश की संभावना</div>
+        <div style="width:260px;height:120px;position:relative">
+          <canvas id="rainfallChart" style="width:260px!important;height:120px!important"></canvas>
+        </div>
+        <div class="text-xs text-gray-400 text-right mt-1">अगले 7 दिन</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 Column Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <!-- Risk Card -->
+    <div class="card border-l-4" id="risk-card-border">
+      <div class="text-xs font-bold uppercase tracking-wider mb-2" id="risk-header-text">⚠️ फसल को खतरा</div>
+      <div class="inline-block px-3 py-1 rounded-full text-white text-sm font-bold mb-2" id="risk-badge">Loading...</div>
+      <div class="mb-2">
+        <div class="text-xs text-gray-500 mb-1">खतरा मीटर:</div>
+        <div class="flex gap-1" id="khatra-meter">
+          <span class="text-gray-300 text-lg">●</span>
+          <span class="text-gray-300 text-lg">●</span>
+          <span class="text-gray-300 text-lg">●</span>
+          <span class="text-gray-300 text-lg">●</span>
+          <span class="text-gray-300 text-lg">●</span>
+        </div>
+      </div>
+      <div class="text-gray-800 font-semibold text-sm leading-relaxed" id="risk-message">Loading...</div>
+      <div class="text-xs text-gray-400 mt-1" id="risk-detail"></div>
+    </div>
+
+    <!-- Irrigation Card -->
+    <div class="card border-l-4 border-blue-400">
+      <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-2">💧 सिंचाई की सलाह</div>
+      <div class="w-full py-2 rounded-lg text-center text-white font-bold text-sm mb-3" id="irrigation-badge">Loading...</div>
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 text-sm text-gray-700">
+          <span>⏰</span>
+          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg font-medium" id="irrigation-timing">--</span>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <span>🪣</span>
+          <span id="irrigation-volume">--</span>
+        </div>
+      </div>
+      <button class="w-full mt-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold text-sm transition-colors" id="pump-btn">
+        ⚡ पंप चलाएं
+      </button>
+    </div>
+
+    <!-- Fasal Ki Sehat Card -->
+    <div class="card border-l-4 border-green-500">
+      <div class="text-green-600 text-xs font-bold uppercase tracking-wider mb-2">🌱 फसल की सेहत</div>
+      <div class="text-2xl font-bold mb-1" id="health-text">फसल ठीक है</div>
+      <div class="text-gray-500 text-sm mb-3" id="health-subtext">कोई बड़ी समस्या नहीं</div>
+      <div class="flex justify-between items-center text-sm mb-1">
+        <span class="text-gray-600">स्वास्थ्य स्कोर</span>
+        <span class="font-bold" id="health-score">80%</span>
+      </div>
+      <div class="w-full bg-gray-100 rounded-full h-3 mb-3">
+        <div class="h-3 rounded-full transition-all duration-500" id="health-bar" style="width:80%;background:#4CAF50"></div>
+      </div>
+      <div class="bg-gray-50 rounded-xl px-3 py-2 text-xs text-gray-500" id="health-next-action">
+        अगली जांच 2 दिन बाद करें।
+      </div>
+    </div>
+  </div>
+
+  <!-- 7-Day Strip -->
+  <div class="card">
+    <div class="text-purple-700 text-xs font-bold uppercase tracking-wider mb-3">📅 अगले 7 दिन का अनुमान</div>
+    <div class="flex gap-3 overflow-x-auto pb-2" id="seven-day-strip">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- AI Advisory Card -->
+  <div class="rounded-2xl p-5 bg-gradient-to-r from-green-900 to-green-700 text-white">
+    <div class="flex items-start gap-4">
+      <div class="text-4xl">🤖</div>
+      <div class="flex-1">
+        <div class="text-green-300 text-xs font-bold uppercase tracking-wider mb-2">
+          🤖 AI &nbsp; किसानमित्र AI की सलाह
+        </div>
+        <div class="text-xl font-bold leading-snug mb-1" id="ai-advisory-text">
+          सही समय पर सिंचाई करें और उपज बढ़ाएं।
+        </div>
+        <div class="text-green-300 text-sm" id="ai-advisory-sub">
+          हमारा मॉडल बताता है कि अगले 48 घंटों में मिट्टी की नमी कम होगी।
+        </div>
+        <div class="text-green-400 text-xs mt-2">- आपका किसानमित्र सहायक</div>
+      </div>
+      <button onclick="window.location.href='index.html'"
+        class="bg-white text-green-900 font-bold text-sm px-4 py-2 rounded-xl hover:bg-green-50 transition-colors whitespace-nowrap">
+        पूरी रिपोर्ट देखें ↗
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Error State -->
+<div id="error-state" class="hidden flex flex-col items-center justify-center py-20 px-6 text-center">
+  <div class="text-5xl mb-4">⚠️</div>
+  <div class="text-red-700 font-semibold text-lg">डेटा लोड नहीं हो सका</div>
+  <div class="text-gray-500 text-sm mt-1 mb-4">इंटरनेट कनेक्शन जांचें</div>
+  <button onclick="refreshData()" class="bg-green-700 text-white px-6 py-2 rounded-xl font-semibold">
+    दोबारा कोशिश करें
+  </button>
+</div>
+
+<!-- Bottom Nav -->
+<div class="fixed bottom-0 w-full bg-white border-t border-gray-100 flex justify-around py-3 z-50 md:hidden">
+  <button class="flex flex-col items-center text-green-800 font-medium text-xs">
+    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">dashboard</span>
+    डैशबोर्ड
+  </button>
+  <button class="flex flex-col items-center text-gray-400 text-xs" onclick="window.location.href='index.html'">
+    <span class="material-symbols-outlined">cloud</span>
+    मौसम
+  </button>
+</div>
+
+<script>
+const BACKEND_URL = sessionStorage.getItem("backend_url") || "http://localhost:8000";
+const lat = parseFloat(sessionStorage.getItem("lat") || "22.719");
+const lon = parseFloat(sessionStorage.getItem("lon") || "75.857");
+const crop = sessionStorage.getItem("crop") || "wheat";
+const stage = sessionStorage.getItem("stage") || "vegetative";
+const language = sessionStorage.getItem("language") || "hi";
+const locationName = sessionStorage.getItem("location_name") || "Indore";
+
+const CROP_NAMES = {
+  wheat:"Wheat-गेहूं", rice:"Rice-चावल", soybean:"Soybean-सोयाबीन",
+  cotton:"Cotton-कपास", sugarcane:"Sugarcane-गन्ना", onion:"Onion-प्याज", tomato:"Tomato-टमाटर"
+};
+
+const WEATHER_MESSAGES = {
+  hot: "गर्मी अधिक रहेगी", rain: "Baarish Hone Ki Sambhavna", cold: "Thand Ka Mouka",
+  windy: "Tez Hawa Chalegi", normal: "Mausam Theek Rahega"
+};
+
+const DAY_NAMES = ["आज","Kal","Parso","Thu","Fri","Sat","Sun","Mon","Tue","Wed"];
+const WEATHER_ICONS = {
+  sunny: "☀️", cloudy: "⛅", rainy: "🌧️", windy: "💨", hot: "🔆", cold: "❄️"
+};
+
+// Update static info
+document.getElementById("location-display").textContent = locationName;
+document.getElementById("crop-display").textContent = CROP_NAMES[crop] || crop;
+document.getElementById("breadcrumb").textContent = `${locationName} | ${CROP_NAMES[crop]} | आज की सलाह`;
+
+function getमौसमMessage(maxTemp, rain, wind) {
+  if (rain > 20) return "बारिश होने की संभावना ☁️";
+  if (maxTemp > 38) return "गर्मी अधिक रहेगी 🔆";
+  if (maxTemp < 10) return "ठंड का मौका ❄️";
+  if (wind > 50) return "तेज हवा चलेगी 💨";
+  return "मौसम ठीक रहेगा ✅";
+}
+
+function getमौसमAdvice(maxTemp, rain, wind) {
+  if (rain > 20) return "☁️ आज बारिश की संभावना है — सिंचाई बंद रखें और नालियां साफ करें";
+  if (maxTemp > 38) return "☀️ आज बहुत गर्मी पड़ेगी — फसल को सुबह 5-7 बजे सिंचाई करें";
+  if (wind > 50) return "💨 तेज हवा के कारण आज कीटनाशक का छिड़काव न करें";
+  return "✅ आज मौसम ठीक है — फसल की नियमित देखभाल करें";
+}
+
+function updateKhatraMeter(severity) {
+  const dots = document.querySelectorAll("#khatra-meter span");
+  const colors = {1:"text-yellow-400", 2:"text-orange-400", 3:"text-red-500", 4:"text-red-600", 5:"text-red-700"};
+  dots.forEach((dot, i) => {
+    dot.className = `text-lg ${i < severity ? (colors[severity] || "text-red-500") : "text-gray-200"}`;
+  });
+}
+
+function updateRiskCard(risks) {
+  const card = document.getElementById("risk-card-border");
+  const badge = document.getElementById("risk-badge");
+  const msg = document.getElementById("risk-message");
+  const detail = document.getElementById("risk-detail");
+
+  if (!risks || risks.length === 0) {
+    card.className = "card border-l-4 border-green-500";
+    badge.textContent = "🟢 SURAKSHIT";
+    badge.className = "inline-block px-3 py-1 rounded-full text-white text-sm font-bold mb-2 bg-green-500";
+    msg.textContent = "आज koi mausam khatra nahi — fasal surakshit hai";
+    updateKhatraMeter(0);
+    return;
+  }
+
+  const topRisk = risks[0];
+  const sev = topRisk.severity || 1;
+  updateKhatraMeter(sev);
+
+  if (sev >= 4) {
+    card.className = "card border-l-4 border-red-600";
+    badge.textContent = "🔴 ADHIK KHATRA";
+    badge.className = "inline-block px-3 py-1 rounded-full text-white text-sm font-bold mb-2 bg-red-600";
+  } else if (sev >= 2) {
+    card.className = "card border-l-4 border-orange-400";
+    badge.textContent = "🟡 सावधान";
+    badge.className = "inline-block px-3 py-1 rounded-full text-white text-sm font-bold mb-2 bg-orange-400";
+  } else {
+    card.className = "card border-l-4 border-yellow-400";
+    badge.textContent = "🟡 ध्यान दें";
+    badge.className = "inline-block px-3 py-1 rounded-full text-white text-sm font-bold mb-2 bg-yellow-500";
+  }
+
+  msg.textContent = topRisk.advisory || "मौसम पर ध्यान रखें";
+  detail.textContent = `${topRisk.type?.toUpperCase()}: ${topRisk.detected_value} (सीमा: ${topRisk.threshold})`;
+}
+
+function updateIrrigationCard(schedule) {
+  if (!schedule || schedule.length === 0) return;
+  const today = schedule[0];
+  const badge = document.getElementById("irrigation-badge");
+  const timing = document.getElementById("irrigation-timing");
+  const volume = document.getElementById("irrigation-volume");
+  const btn = document.getElementById("pump-btn");
+
+  if (today.decision === "SKIP") {
+    badge.textContent = "⛔ AAJ सिंचाई बंद";
+    badge.className = "w-full py-2 rounded-lg text-center text-white font-bold text-sm mb-3 bg-red-500";
+    timing.textContent = "बारिश आने वाली है — पंप बंद रखें";
+    volume.textContent = "आज पानी देने की ज़रूरत नहीं";
+    btn.className = "w-full mt-3 py-2 bg-gray-400 text-white rounded-xl font-bold text-sm";
+    btn.textContent = "⛔ आज बंद रखें";
+  } else if (today.decision === "REDUCE") {
+    badge.textContent = "⚡ कम सिंचाई करो";
+    badge.className = "w-full py-2 rounded-lg text-center text-white font-bold text-sm mb-3 bg-orange-400";
+    timing.textContent = "सुबह 5-7 बजे — थोड़ा पानी";
+    volume.textContent = `Pump: 20-25 min | ~${today.volume_liters_display || "--"}`;
+    btn.textContent = "⚡ पंप चलाएं";
+  } else {
+    badge.textContent = "✅ आज सिंचाई करो";
+    badge.className = "w-full py-2 rounded-lg text-center text-white font-bold text-sm mb-3 bg-green-500";
+    timing.textContent = "सुबह 5-7 बजे के बीच";
+    volume.textContent = `पंप: 45 मिनट | ~${today.volume_liters_display || "--"}`;
+    btn.textContent = "⚡ पंप चलाएं";
+  }
+}
+
+function updateSevenDayStrip(forecast, schedule) {
+  const strip = document.getElementById("seven-day-strip");
+  strip.innerHTML = "";
+
+  forecast.slice(0, 7).forEach((day, i) => {
+    const irrigation = schedule && schedule[i] ? schedule[i].decision : "IRRIGATE";
+    const rain = day.rainfall_prob_pct || 0;
+    const temp = day.temp_max_c || "--";
+    const icon = rain > 60 ? "🌧️" : rain > 30 ? "⛅" : day.temp_max_c > 35 ? "🔆" : "☀️";
+    const badge = irrigation === "SKIP" || irrigation === "REDUCE"
+      ? `<span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg">बंद</span>`
+      : `<span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded-lg">सिंचाई</span>`;
+
+    const date = new Date(day.date);
+    const dayLabel = i === 0 ? "आज" : date.toLocaleDateString("hi-IN", {weekday:"short"});
+    const dateLabel = date.toLocaleDateString("en-IN", {day:"numeric", month:"short"});
+
+    strip.innerHTML += `
+      <div class="day-card flex-shrink-0">
+        <div class="text-xs text-gray-400 font-medium">${dateLabel}</div>
+        <div class="text-xs font-semibold text-gray-600 mb-1">${dayLabel}</div>
+        <div class="text-2xl my-1">${icon}</div>
+        <div class="text-sm font-bold text-gray-800 mb-1">${temp}°C</div>
+        ${badge}
+      </div>`;
+  });
+}
+
+function buildRainfallChart(forecast) {
+  const ctx = document.getElementById("rainfallChart").getContext("2d");
+  const labels = forecast.slice(0,7).map((d,i) => {
+    const date = new Date(d.date);
+    return i === 0 ? "आज" : date.toLocaleDateString("en-IN",{weekday:"short"});
+  });
+  const data = forecast.slice(0,7).map(d => d.rainfall_prob_pct || 0);
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: data.map(v => v > 60 ? "#1565C0" : v > 30 ? "#42A5F5" : "#90CAF9"),
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min:0, max:100, ticks:{ stepSize:25, font:{size:10} }, grid:{color:"#f0f0f0"} },
+        x: { ticks:{ font:{size:10} }, grid:{ display:false } }
+      },
+      responsive: false,
+      maintainAspectRatio: false,
+    }
+  });
+}
+
+function updateHealthCard(risks) {
+  const hasRisk = risks && risks.length > 0;
+  const maxSev = hasRisk ? Math.max(...risks.map(r => r.severity||0)) : 0;
+  const healthScore = Math.max(40, 100 - (maxSev * 15));
+  const bar = document.getElementById("health-bar");
+  const text = document.getElementById("health-text");
+  const sub = document.getElementById("health-subtext");
+  const score = document.getElementById("health-score");
+  const next = document.getElementById("health-next-action");
+
+  score.textContent = healthScore + "%";
+  bar.style.width = healthScore + "%";
+
+  if (healthScore > 75) {
+    bar.style.background = "#4CAF50";
+    text.textContent = "फसल ठीक है";
+    text.className = "text-2xl font-bold mb-1 text-green-700";
+    sub.textContent = "कोई बड़ी समस्या नहीं";
+    next.textContent = "अगली जांच 2 दिन बाद करें।";
+  } else if (healthScore > 50) {
+    bar.style.background = "#FF9800";
+    text.textContent = "ध्यान दें";
+    text.className = "text-2xl font-bold mb-1 text-orange-600";
+    sub.textContent = "कुछ मौसम जोखिम मिले";
+    next.textContent = "कल सुबह फसल की जांच करें।";
+  } else {
+    bar.style.background = "#F44336";
+    text.textContent = "तुरंत कदम उठाएं";
+    text.className = "text-2xl font-bold mb-1 text-red-600";
+    sub.textContent = "Adhik khatra — turant dhyan de";
+    next.textContent = "अभी अपने खेत में जाएं।";
+  }
+}
+
+async function loadडैशबोर्ड() {
+  document.getElementById("loading-state").classList.remove("hidden");
+  document.getElementById("main-content").classList.add("hidden");
+  document.getElementById("error-state").classList.add("hidden");
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/advisory/full`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        lat, lon, crop, growth_stage: stage,
+        field_area_acres: 1.0, soil_type: "loamy", language
+      })
+    });
+
+    if (!response.ok) throw new Error("API error");
+    const data = await response.json();
+
+    const forecast = data.weather_forecast || [];
+    const risks = data.risk_assessment || [];
+    const irrigation = data.irrigation_schedule || [];
+    const today = forecast[0] || {};
+    const todayRisks = risks[0]?.risks || [];
+
+    // Update weather card
+    document.getElementById("weather-main-text").textContent =
+      getमौसमMessage(today.temp_max_c, today.rainfall_mm, today.wind_max_kmh);
+    document.getElementById("temp-display").textContent = `🌡️ ${today.temp_max_c || "--"}°C`;
+    document.getElementById("rain-display").textContent = `🌧️ ${today.rainfall_mm || 0}mm`;
+    document.getElementById("wind-display").textContent = `💨 ${today.wind_max_kmh || "--"}km/h`;
+    document.getElementById("temp-min").textContent = today.temp_min_c || "--";
+    document.getElementById("temp-max").textContent = today.temp_max_c || "--";
+    document.getElementById("rain-prob").textContent = today.rainfall_prob_pct || "--";
+    document.getElementById("weather-advisory-text").textContent =
+      getमौसमAdvice(today.temp_max_c, today.rainfall_mm, today.wind_max_kmh);
+
+    // Update all cards
+    updateRiskCard(todayRisks);
+    updateIrrigationCard(irrigation);
+    updateSevenDayStrip(forecast, irrigation);
+    updateHealthCard(todayRisks);
+    buildRainfallChart(forecast);
+
+    // AI advisory
+    if (data.alert_required) {
+      document.getElementById("ai-advisory-text").textContent =
+        todayRisks[0]?.advisory || "आज mausam par dhyan rakhein.";
+      document.getElementById("ai-advisory-sub").textContent =
+        `Khatra level: ${risks[0]?.max_severity_label || "Low"} — अपनी फसल की देखभाल करें।`;
+    }
+
+    document.getElementById("last-updated").textContent =
+      new Date().toLocaleTimeString("hi-IN", {hour:"2-digit", minute:"2-digit"}) + " बजे अपडेट हुआ";
+
+    document.getElementById("loading-state").classList.add("hidden");
+    document.getElementById("main-content").classList.remove("hidden");
+
+  } catch (err) {
+    console.error("Load error:", err);
+    document.getElementById("loading-state").classList.add("hidden");
+    document.getElementById("error-state").classList.remove("hidden");
+  }
+}
+
+function refreshData() {
+  const icon = document.getElementById("refresh-icon");
+  icon.style.animation = "spin 1s linear infinite";
+  loadडैशबोर्ड().then(() => icon.style.animation = "");
+}
+
+function toggleमौसमDetails() {
+  const d = document.getElementById("weather-details");
+  d.classList.toggle("hidden");
+}
+
+// Start
+window.onload = loadडैशबोर्ड;
+</script>
+
+<style>
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+</style>
+</body>
+</html>
