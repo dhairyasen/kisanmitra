@@ -79,7 +79,7 @@
         <div class="bg-green-50 border border-green-200 rounded-xl px-4 py-3">
           <span class="text-green-800 text-sm font-medium" id="weather-advisory-text">☀️ Loading advisory...</span>
         </div>
-        <button onclick="toggleमौसमDetails()" class="text-blue-500 text-sm mt-2 hover:underline">और जानकारी →</button>
+        <button onclick="toggleमौसमDetails()" class="text-blue-500 text-sm mt-2 hover:underline"><span class="aur-jaankari">और जानकारी →</span></button>
         <div id="weather-details" class="hidden mt-2 text-sm text-gray-500 space-y-1">
           <div>Min Temp: <span id="temp-min">--</span>°C | Max Temp: <span id="temp-max">--</span>°C</div>
           <div>Rain Probability: <span id="rain-prob">--</span>%</div>
@@ -141,7 +141,7 @@
       <div class="text-2xl font-bold mb-1" id="health-text">फसल ठीक है</div>
       <div class="text-gray-500 text-sm mb-3" id="health-subtext">कोई बड़ी समस्या नहीं</div>
       <div class="flex justify-between items-center text-sm mb-1">
-        <span class="text-gray-600">स्वास्थ्य स्कोर</span>
+        <span class="text-gray-600"><span id="health-score-label">स्वास्थ्य स्कोर</span></span>
         <span class="font-bold" id="health-score">80%</span>
       </div>
       <div class="w-full bg-gray-100 rounded-full h-3 mb-3">
@@ -221,6 +221,152 @@ const CROP_NAMES = {
   wheat:"Wheat-गेहूं", rice:"Rice-चावल", soybean:"Soybean-सोयाबीन",
   cotton:"Cotton-कपास", sugarcane:"Sugarcane-गन्ना", onion:"Onion-प्याज", tomato:"Tomato-टमाटर"
 };
+
+const UI_TEXT = {
+  hi: {
+    weather_card: "आज का मौसम", risk_card: "फसल को खतरा", irrigation_card: "सिंचाई की सलाह",
+    health_card: "फसल की सेहत", seven_day: "अगले 7 दिन का अनुमान", ai_card: "किसानमित्र AI की सलाह",
+    irrigate: "आज सिंचाई करो", skip: "आज सिंचाई बंद", reduce: "कम सिंचाई करो",
+    timing: "सुबह 5-7 बजे के बीच", pump: "पंप चलाएं", more_info: "और जानकारी →",
+    health_good: "फसल ठीक है", health_warn: "ध्यान दें", health_danger: "तुरंत कदम उठाएं",
+    health_sub_good: "कोई बड़ी समस्या नहीं", health_sub_warn: "कुछ मौसम जोखिम मिले",
+    health_score: "स्वास्थ्य स्कोर", next_check: "अगली जांच 2 दिन बाद करें।",
+    risk_safe: "🟢 सुरक्षित", risk_warn: "🟡 सावधान", risk_high: "🔴 अधिक खतरा",
+    updated: "बजे अपडेट हुआ", salah: "आज की सलाह", full_report: "पूरी रिपोर्ट देखें",
+    loading: "मौसम की जानकारी ले रहे हैं...", loading_sub: "आपकी फसल के लिए सलाह तैयार हो रही है",
+    error: "डेटा लोड नहीं हो सका", error_sub: "इंटरनेट कनेक्शन जांचें", retry: "दोबारा कोशिश करें",
+    khatra_meter: "खतरा मीटर:", aur_jaankari: "और जानकारी →"
+  },
+  mr: {
+    weather_card: "आजचे हवामान", risk_card: "पिकाला धोका", irrigation_card: "सिंचनाचा सल्ला",
+    health_card: "पिकाची तब्येत", seven_day: "पुढील 7 दिवसांचा अंदाज", ai_card: "किसानमित्र AI चा सल्ला",
+    irrigate: "आज सिंचन करा", skip: "आज सिंचन बंद", reduce: "कमी सिंचन करा",
+    timing: "सकाळी 5-7 वाजेच्या दरम्यान", pump: "पंप चालवा", more_info: "अधिक माहिती →",
+    health_good: "पीक ठीक आहे", health_warn: "लक्ष द्या", health_danger: "तातडीने पाऊल उचला",
+    health_sub_good: "कोणतीही मोठी समस्या नाही", health_sub_warn: "काही हवामान धोके आढळले",
+    health_score: "आरोग्य स्कोर", next_check: "पुढील तपासणी 2 दिवसांनी करा.",
+    risk_safe: "🟢 सुरक्षित", risk_warn: "🟡 सावध राहा", risk_high: "🔴 जास्त धोका",
+    updated: "वाजता अपडेट झाले", salah: "आजचा सल्ला", full_report: "पूर्ण अहवाल पहा",
+    loading: "हवामान माहिती घेत आहोत...", loading_sub: "तुमच्या पिकासाठी सल्ला तयार होत आहे",
+    error: "डेटा लोड झाला नाही", error_sub: "इंटरनेट कनेक्शन तपासा", retry: "पुन्हा प्रयत्न करा",
+    khatra_meter: "धोका मीटर:", aur_jaankari: "अधिक माहिती →"
+  },
+  kn: {
+    weather_card: "ಇಂದಿನ ಹವಾಮಾನ", risk_card: "ಬೆಳೆಗೆ ಅಪಾಯ", irrigation_card: "ನೀರಾವರಿ ಸಲಹೆ",
+    health_card: "ಬೆಳೆಯ ಆರೋಗ್ಯ", seven_day: "ಮುಂದಿನ 7 ದಿನಗಳ ಮುನ್ಸೂಚನೆ", ai_card: "ಕಿಸಾನ್‌ಮಿತ್ರ AI ಸಲಹೆ",
+    irrigate: "ಇಂದು ನೀರಾವರಿ ಮಾಡಿ", skip: "ಇಂದು ನೀರಾವರಿ ಬೇಡ", reduce: "ಕಡಿಮೆ ನೀರಾವರಿ",
+    timing: "ಬೆಳಿಗ್ಗೆ 5-7 ಗಂಟೆಯ ನಡುವೆ", pump: "ಪಂಪ್ ಚಾಲಿಸಿ", more_info: "ಹೆಚ್ಚಿನ ಮಾಹಿತಿ →",
+    health_good: "ಬೆಳೆ ಸರಿಯಾಗಿದೆ", health_warn: "ಗಮನ ಕೊಡಿ", health_danger: "ತಕ್ಷಣ ಕ್ರಮ ತೆಗೆದುಕೊಳ್ಳಿ",
+    health_sub_good: "ಯಾವುದೇ ದೊಡ್ಡ ಸಮಸ್ಯೆ ಇಲ್ಲ", health_sub_warn: "ಕೆಲವು ಹವಾಮಾನ ಅಪಾಯಗಳು ಕಂಡುಬಂದಿವೆ",
+    health_score: "ಆರೋಗ್ಯ ಸ್ಕೋರ್", next_check: "ಮುಂದಿನ ಪರೀಕ್ಷೆ 2 ದಿನಗಳ ನಂತರ.",
+    risk_safe: "🟢 ಸುರಕ್ಷಿತ", risk_warn: "🟡 ಎಚ್ಚರಿಕೆ", risk_high: "🔴 ಹೆಚ್ಚು ಅಪಾಯ",
+    updated: "ಗಂಟೆಗೆ ಅಪ್‌ಡೇಟ್", salah: "ಇಂದಿನ ಸಲಹೆ", full_report: "ಪೂರ್ಣ ವರದಿ ನೋಡಿ",
+    loading: "ಹವಾಮಾನ ಮಾಹಿತಿ ತರುತ್ತಿದ್ದೇವೆ...", loading_sub: "ನಿಮ್ಮ ಬೆಳೆಗೆ ಸಲಹೆ ತಯಾರಾಗುತ್ತಿದೆ",
+    error: "ಡೇಟಾ ಲೋಡ್ ಆಗಲಿಲ್ಲ", error_sub: "ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ", retry: "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    khatra_meter: "ಅಪಾಯ ಮೀಟರ್:", aur_jaankari: "ಹೆಚ್ಚಿನ ಮಾಹಿತಿ →"
+  },
+  te: {
+    weather_card: "ఈరోజు వాతావరణం", risk_card: "పంటకు ప్రమాదం", irrigation_card: "నీటిపారుదల సలహా",
+    health_card: "పంట ఆరోగ్యం", seven_day: "రాబోయే 7 రోజుల అంచనా", ai_card: "కిసాన్‌మిత్ర AI సలహా",
+    irrigate: "ఈరోజు నీరు పెట్టండి", skip: "ఈరోజు నీరు వద్దు", reduce: "తక్కువ నీరు పెట్టండి",
+    timing: "ఉదయం 5-7 గంటల మధ్య", pump: "పంపు నడపండి", more_info: "మరింత సమాచారం →",
+    health_good: "పంట బాగుంది", health_warn: "శ్రద్ధ వహించండి", health_danger: "వెంటనే చర్య తీసుకోండి",
+    health_sub_good: "పెద్ద సమస్య లేదు", health_sub_warn: "కొన్ని వాతావరణ ప్రమాదాలు కనుగొనబడ్డాయి",
+    health_score: "ఆరోగ్య స్కోరు", next_check: "తదుపరి తనిఖీ 2 రోజుల తర్వాత.",
+    risk_safe: "🟢 సురక్షితం", risk_warn: "🟡 జాగ్రత్త", risk_high: "🔴 ఎక్కువ ప్రమాదం",
+    updated: "గంటలకు అప్‌డేట్", salah: "ఈరోజు సలహా", full_report: "పూర్తి నివేదిక చూడండి",
+    loading: "వాతావరణ సమాచారం తీసుకుంటున్నాం...", loading_sub: "మీ పంటకు సలహా సిద్ధమవుతోంది",
+    error: "డేటా లోడ్ కాలేదు", error_sub: "ఇంటర్నెట్ కనెక్షన్ తనిఖీ చేయండి", retry: "మళ్ళీ ప్రయత్నించండి",
+    khatra_meter: "ప్రమాద మీటర్:", aur_jaankari: "మరింత సమాచారం →"
+  },
+  ta: {
+    weather_card: "இன்றைய வானிலை", risk_card: "பயிருக்கு ஆபத்து", irrigation_card: "நீர்ப்பாசன ஆலோசனை",
+    health_card: "பயிரின் ஆரோக்கியம்", seven_day: "அடுத்த 7 நாட்கள் முன்னறிவிப்பு", ai_card: "கிசான்மித்ர AI ஆலோசனை",
+    irrigate: "இன்று நீர் பாய்ச்சுங்கள்", skip: "இன்று நீர் வேண்டாம்", reduce: "குறைவாக நீர் பாய்ச்சுங்கள்",
+    timing: "காலை 5-7 மணிக்கு இடையில்", pump: "பம்பை இயக்குங்கள்", more_info: "மேலும் தகவல் →",
+    health_good: "பயிர் நலமாக உள்ளது", health_warn: "கவனம் செலுத்துங்கள்", health_danger: "உடனடியாக நடவடிக்கை எடுங்கள்",
+    health_sub_good: "பெரிய பிரச்சனை இல்லை", health_sub_warn: "சில வானிலை அபாயங்கள் கண்டறியப்பட்டன",
+    health_score: "ஆரோக்கிய மதிப்பெண்", next_check: "அடுத்த சோதனை 2 நாட்களுக்கு பிறகு.",
+    risk_safe: "🟢 பாதுகாப்பானது", risk_warn: "🟡 எச்சரிக்கை", risk_high: "🔴 அதிக ஆபத்து",
+    updated: "மணிக்கு புதுப்பிக்கப்பட்டது", salah: "இன்றைய ஆலோசனை", full_report: "முழு அறிக்கை பார்க்கவும்",
+    loading: "வானிலை தகவல் பெறுகிறோம்...", loading_sub: "உங்கள் பயிருக்கான ஆலோசனை தயாராகிறது",
+    error: "தரவு ஏற்றப்படவில்லை", error_sub: "இணைய இணைப்பை சரிபார்க்கவும்", retry: "மீண்டும் முயற்சிக்கவும்",
+    khatra_meter: "ஆபத்து மீட்டர்:", aur_jaankari: "மேலும் தகவல் →"
+  },
+  pa: {
+    weather_card: "ਅੱਜ ਦਾ ਮੌਸਮ", risk_card: "ਫ਼ਸਲ ਨੂੰ ਖ਼ਤਰਾ", irrigation_card: "ਸਿੰਚਾਈ ਦੀ ਸਲਾਹ",
+    health_card: "ਫ਼ਸਲ ਦੀ ਸਿਹਤ", seven_day: "ਅਗਲੇ 7 ਦਿਨਾਂ ਦਾ ਅਨੁਮਾਨ", ai_card: "ਕਿਸਾਨਮਿੱਤਰ AI ਦੀ ਸਲਾਹ",
+    irrigate: "ਅੱਜ ਸਿੰਚਾਈ ਕਰੋ", skip: "ਅੱਜ ਸਿੰਚਾਈ ਬੰਦ", reduce: "ਘੱਟ ਸਿੰਚਾਈ ਕਰੋ",
+    timing: "ਸਵੇਰੇ 5-7 ਵਜੇ ਦੇ ਵਿਚਕਾਰ", pump: "ਪੰਪ ਚਲਾਓ", more_info: "ਹੋਰ ਜਾਣਕਾਰੀ →",
+    health_good: "ਫ਼ਸਲ ਠੀਕ ਹੈ", health_warn: "ਧਿਆਨ ਦਿਓ", health_danger: "ਤੁਰੰਤ ਕਦਮ ਚੁੱਕੋ",
+    health_sub_good: "ਕੋਈ ਵੱਡੀ ਸਮੱਸਿਆ ਨਹੀਂ", health_sub_warn: "ਕੁਝ ਮੌਸਮ ਖ਼ਤਰੇ ਮਿਲੇ",
+    health_score: "ਸਿਹਤ ਸਕੋਰ", next_check: "ਅਗਲੀ ਜਾਂਚ 2 ਦਿਨ ਬਾਅਦ ਕਰੋ।",
+    risk_safe: "🟢 ਸੁਰੱਖਿਅਤ", risk_warn: "🟡 ਸਾਵਧਾਨ", risk_high: "🔴 ਵੱਧ ਖ਼ਤਰਾ",
+    updated: "ਵਜੇ ਅੱਪਡੇਟ ਹੋਇਆ", salah: "ਅੱਜ ਦੀ ਸਲਾਹ", full_report: "ਪੂਰੀ ਰਿਪੋਰਟ ਦੇਖੋ",
+    loading: "ਮੌਸਮ ਦੀ ਜਾਣਕਾਰੀ ਲੈ ਰਹੇ ਹਾਂ...", loading_sub: "ਤੁਹਾਡੀ ਫ਼ਸਲ ਲਈ ਸਲਾਹ ਤਿਆਰ ਹੋ ਰਹੀ ਹੈ",
+    error: "ਡੇਟਾ ਲੋਡ ਨਹੀਂ ਹੋਇਆ", error_sub: "ਇੰਟਰਨੈੱਟ ਕਨੈਕਸ਼ਨ ਜਾਂਚੋ", retry: "ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
+    khatra_meter: "ਖ਼ਤਰਾ ਮੀਟਰ:", aur_jaankari: "ਹੋਰ ਜਾਣਕਾਰੀ →"
+  },
+  bn: {
+    weather_card: "আজকের আবহাওয়া", risk_card: "ফসলে বিপদ", irrigation_card: "সেচের পরামর্শ",
+    health_card: "ফসলের স্বাস্থ্য", seven_day: "আগামী 7 দিনের পূর্বাভাস", ai_card: "কিসানমিত্র AI পরামর্শ",
+    irrigate: "আজ সেচ দিন", skip: "আজ সেচ বন্ধ", reduce: "কম সেচ দিন",
+    timing: "সকাল 5-7 টার মধ্যে", pump: "পাম্প চালান", more_info: "আরও তথ্য →",
+    health_good: "ফসল ভালো আছে", health_warn: "মনোযোগ দিন", health_danger: "এখনই পদক্ষেপ নিন",
+    health_sub_good: "কোনো বড় সমস্যা নেই", health_sub_warn: "কিছু আবহাওয়া ঝুঁকি পাওয়া গেছে",
+    health_score: "স্বাস্থ্য স্কোর", next_check: "পরবর্তী পরীক্ষা 2 দিন পরে করুন।",
+    risk_safe: "🟢 নিরাপদ", risk_warn: "🟡 সাবধান", risk_high: "🔴 বেশি বিপদ",
+    updated: "টায় আপডেট হয়েছে", salah: "আজকের পরামর্শ", full_report: "পূর্ণ রিপোর্ট দেখুন",
+    loading: "আবহাওয়ার তথ্য নেওয়া হচ্ছে...", loading_sub: "আপনার ফসলের জন্য পরামর্শ তৈরি হচ্ছে",
+    error: "ডেটা লোড হয়নি", error_sub: "ইন্টারনেট সংযোগ পরীক্ষা করুন", retry: "আবার চেষ্টা করুন",
+    khatra_meter: "বিপদ মিটার:", aur_jaankari: "আরও তথ্য →"
+  },
+  en: {
+    weather_card: "Today's Weather", risk_card: "Crop Risk", irrigation_card: "Irrigation Advice",
+    health_card: "Crop Health", seven_day: "Next 7 Days Forecast", ai_card: "KisanMitra AI Advisory",
+    irrigate: "Irrigate Today", skip: "Skip Irrigation", reduce: "Reduce Irrigation",
+    timing: "Between 5-7 AM", pump: "Run Pump", more_info: "More Info →",
+    health_good: "Crop is Healthy", health_warn: "Attention Needed", health_danger: "Take Immediate Action",
+    health_sub_good: "No major issues", health_sub_warn: "Some weather risks detected",
+    health_score: "Health Score", next_check: "Next check in 2 days.",
+    risk_safe: "🟢 Safe", risk_warn: "🟡 Caution", risk_high: "🔴 High Risk",
+    updated: "updated at", salah: "Today's Advisory", full_report: "View Full Report",
+    loading: "Fetching weather data...", loading_sub: "Preparing advisory for your crop",
+    error: "Data could not load", error_sub: "Check internet connection", retry: "Try Again",
+    khatra_meter: "Risk Meter:", aur_jaankari: "More Info →"
+  }
+};
+
+function t(key) {
+  const lang = sessionStorage.getItem("language") || "hi";
+  return (UI_TEXT[lang] || UI_TEXT["hi"])[key] || UI_TEXT["hi"][key] || key;
+}
+
+function applyUILanguage() {
+  // Apply all UI text translations
+  const el = (id) => document.getElementById(id);
+  const setText = (id, key) => { const e = el(id); if(e) e.textContent = t(key); };
+
+  // Card headers
+  document.querySelectorAll(".weather-card-header").forEach(e => e.textContent = t("weather_card"));
+  document.querySelectorAll(".risk-card-header").forEach(e => e.textContent = t("risk_card"));
+  document.querySelectorAll(".irrigation-card-header").forEach(e => e.textContent = t("irrigation_card"));
+  document.querySelectorAll(".health-card-header").forEach(e => e.textContent = t("health_card"));
+  document.querySelectorAll(".seven-day-header").forEach(e => e.textContent = t("seven_day"));
+  document.querySelectorAll(".ai-card-header").forEach(e => e.textContent = t("ai_card"));
+
+  // Buttons
+  document.querySelectorAll(".pump-btn").forEach(e => e.textContent = "⚡ " + t("pump"));
+  document.querySelectorAll(".full-report-btn").forEach(e => e.textContent = t("full_report") + " ↗");
+  document.querySelectorAll(".aur-jaankari").forEach(e => e.textContent = t("aur_jaankari"));
+  document.querySelectorAll(".khatra-meter-label").forEach(e => e.textContent = t("khatra_meter"));
+
+  // Loading/error states
+  const loadingText = document.querySelector("#loading-state .text-green-800");
+  if(loadingText) loadingText.textContent = t("loading");
+  const loadingSub = document.querySelector("#loading-state .text-gray-500");
+  if(loadingSub) loadingSub.textContent = t("loading_sub");
+}
 
 const WEATHER_MESSAGES = {
   hot: "गर्मी अधिक रहेगी", rain: "Baarish Hone Ki Sambhavna", cold: "Thand Ka Mouka",
