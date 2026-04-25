@@ -12,6 +12,7 @@ logger = get_logger("risk_classifier")
 
 RISK_TYPES = ["frost", "heatwave", "excess_rain", "high_wind", "flash_flood", "none"]
 
+# Hindi severity labels (used for default/Hindi language)
 SEVERITY_LABELS = {
     1: "कम",
     2: "मध्यम",
@@ -19,6 +20,34 @@ SEVERITY_LABELS = {
     4: "बहुत अधिक",
     5: "गंभीर"
 }
+
+# Multilingual severity labels
+SEVERITY_LABELS_LANG = {
+    "hi": {1:"कम", 2:"मध्यम", 3:"अधिक", 4:"बहुत अधिक", 5:"गंभीर", 0:"कोई नहीं"},
+    "mr": {1:"कमी", 2:"मध्यम", 3:"जास्त", 4:"खूप जास्त", 5:"गंभीर", 0:"काहीही नाही"},
+    "kn": {1:"ಕಡಿಮೆ", 2:"ಮಧ್ಯಮ", 3:"ಹೆಚ್ಚು", 4:"ತುಂಬಾ ಹೆಚ್ಚು", 5:"ತೀವ್ರ", 0:"ಯಾವುದೂ ಇಲ್ಲ"},
+    "te": {1:"తక్కువ", 2:"మధ్యమ", 3:"ఎక్కువ", 4:"చాలా ఎక్కువ", 5:"తీవ్రమైన", 0:"ఏదీ లేదు"},
+    "ta": {1:"குறைவு", 2:"நடுத்தரம்", 3:"அதிகம்", 4:"மிக அதிகம்", 5:"தீவிரமான", 0:"எதுவும் இல்லை"},
+    "pa": {1:"ਘੱਟ", 2:"ਮੱਧਮ", 3:"ਵੱਧ", 4:"ਬਹੁਤ ਵੱਧ", 5:"ਗੰਭੀਰ", 0:"ਕੋਈ ਨਹੀਂ"},
+    "bn": {1:"কম", 2:"মাঝারি", 3:"বেশি", 4:"অনেক বেশি", 5:"গুরুতর", 0:"কোনোটি নয়"},
+    "en": {1:"Low", 2:"Medium", 3:"High", 4:"Very High", 5:"Critical", 0:"None"},
+}
+
+# Crop names in all languages
+CROP_NAMES_LANG = {
+    "wheat":     {"hi":"गेहूं",    "mr":"गहू",      "kn":"ಗೋಧಿ",    "te":"గోధుమ",   "ta":"கோதுமை",  "pa":"ਕਣਕ",     "bn":"গম",      "en":"Wheat"},
+    "rice":      {"hi":"चावल",    "mr":"तांदूळ",   "kn":"ಅಕ್ಕಿ",   "te":"వరి",     "ta":"அரிசி",   "pa":"ਚਾਵਲ",    "bn":"ধান",     "en":"Rice"},
+    "soybean":   {"hi":"सोयाबीन", "mr":"सोयाबीन",  "kn":"ಸೋಯಾಬೀನ್","te":"సోయాబీన్","ta":"சோயாபீன்","pa":"ਸੋਇਆਬੀਨ", "bn":"সয়াবিন",  "en":"Soybean"},
+    "cotton":    {"hi":"कपास",    "mr":"कापूस",    "kn":"ಹತ್ತಿ",   "te":"పత్తి",   "ta":"பருத்தி", "pa":"ਕਪਾਹ",    "bn":"তুলা",    "en":"Cotton"},
+    "sugarcane": {"hi":"गन्ना",   "mr":"ऊस",       "kn":"ಕಬ್ಬು",   "te":"చెరకు",   "ta":"கரும்பு", "pa":"ਗੰਨਾ",    "bn":"আখ",      "en":"Sugarcane"},
+    "onion":     {"hi":"प्याज",   "mr":"कांदा",    "kn":"ಈರುಳ್ಳಿ", "te":"ఉల్లిపాయ","ta":"வெங்காயம்","pa":"ਪਿਆਜ਼",  "bn":"পেঁয়াজ",  "en":"Onion"},
+    "tomato":    {"hi":"टमाटर",   "mr":"टोमॅटो",   "kn":"ಟೊಮ್ಯಾಟೊ","te":"టమాటో",   "ta":"தக்காளி", "pa":"ਟਮਾਟਰ",   "bn":"টমেটো",   "en":"Tomato"},
+}
+
+def get_crop_name(crop: str, language: str) -> str:
+    """Get crop name in the requested language."""
+    names = CROP_NAMES_LANG.get(crop, {})
+    return names.get(language, names.get("en", crop))
 
 
 def classify_risk(
@@ -195,8 +224,6 @@ def classify_risk_translated(
     """
     Same as classify_risk but returns advisory in requested language.
     """
-    import sys
-    sys.path.insert(0, '.')
     from utils.translations import get_translation
 
     try:
@@ -207,15 +234,21 @@ def classify_risk_translated(
     risks = []
     crop_hi = profile["name_hi"]
 
+    # Get crop name in requested language
+    crop_name = get_crop_name(crop, language)
+
+    # Get severity labels for requested language
+    sev_labels = SEVERITY_LABELS_LANG.get(language, SEVERITY_LABELS_LANG["en"])
+
     # Heatwave
     if temp_max_c is not None and temp_max_c > profile["heatwave_temp_c"]:
         severity = _heat_severity(temp_max_c, profile["heatwave_temp_c"])
         advisory = get_translation(language, "heat_advisory",
-                                   temp=temp_max_c, crop=crop_hi)
+                                   temp=temp_max_c, crop=crop_name)
         risks.append({
             "type": "heatwave",
             "severity": severity,
-            "severity_label": SEVERITY_LABELS[severity],
+            "severity_label": sev_labels.get(severity, str(severity)),
             "detected_value": f"{temp_max_c}°C",
             "threshold": f"{profile['heatwave_temp_c']}°C",
             "advisory": advisory
@@ -225,11 +258,11 @@ def classify_risk_translated(
     if temp_min_c is not None and temp_min_c < profile["frost_risk_temp_c"]:
         severity = _frost_severity(temp_min_c, profile["frost_risk_temp_c"], growth_stage)
         advisory = get_translation(language, "frost_advisory",
-                                   temp=temp_min_c, crop=crop_hi)
+                                   temp=temp_min_c, crop=crop_name)
         risks.append({
             "type": "frost",
             "severity": severity,
-            "severity_label": SEVERITY_LABELS[severity],
+            "severity_label": sev_labels.get(severity, str(severity)),
             "detected_value": f"{temp_min_c}°C",
             "threshold": f"{profile['frost_risk_temp_c']}°C",
             "advisory": advisory
@@ -239,11 +272,11 @@ def classify_risk_translated(
     if rainfall_mm is not None and rainfall_mm > profile["max_rain_mm_day"]:
         severity = _rain_severity(rainfall_mm, profile["max_rain_mm_day"])
         advisory = get_translation(language, "rain_advisory",
-                                   rain=rainfall_mm, crop=crop_hi)
+                                   rain=rainfall_mm, crop=crop_name)
         risks.append({
             "type": "excess_rain",
             "severity": severity,
-            "severity_label": SEVERITY_LABELS[severity],
+            "severity_label": sev_labels.get(severity, str(severity)),
             "detected_value": f"{rainfall_mm}mm",
             "threshold": f"{profile['max_rain_mm_day']}mm",
             "advisory": advisory
@@ -257,7 +290,7 @@ def classify_risk_translated(
         risks.append({
             "type": "high_wind",
             "severity": severity,
-            "severity_label": SEVERITY_LABELS[severity],
+            "severity_label": sev_labels.get(severity, str(severity)),
             "detected_value": f"{wind_kmh}km/h",
             "threshold": f"{profile['wind_risk_kmh']}km/h",
             "advisory": advisory
@@ -272,7 +305,7 @@ def classify_risk_translated(
         "growth_stage": growth_stage,
         "risks": risks,
         "max_severity": max_severity,
-        "max_severity_label": SEVERITY_LABELS.get(max_severity, "कोई नहीं"),
+        "max_severity_label": sev_labels.get(max_severity, "None"),
         "alert_required": max_severity >= 3,
         "emergency": max_severity >= 5,
         "total_risks_detected": len(risks),
