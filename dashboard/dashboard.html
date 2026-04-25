@@ -536,7 +536,7 @@ function updateSevenDayStrip(forecast, schedule) {
     const temp = day.temp_max_c || "--";
     const icon = rain > 60 ? "🌧️" : rain > 30 ? "⛅" : day.temp_max_c > 35 ? "🔆" : "☀️";
     const badge = irrigation === "SKIP" || irrigation === "REDUCE"
-      ? `<span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg">${t("skip_short") || t("band") || "बंद"}</span>`
+      ? `<span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg">${t("band") || "बंद"}</span>`
       : `<span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded-lg">${t("sinchai") || t("irrigate") || "सिंचाई"}</span>`;
 
     const date = new Date(day.date);
@@ -662,13 +662,11 @@ async function loadडैशबोर्ड() {
     updateHealthCard(todayRisks);
     buildRainfallChart(forecast);
 
-    // AI advisory
-    if (data.alert_required) {
-      document.getElementById("ai-advisory-text").textContent =
-        todayRisks[0]?.advisory || t("ai_advisory") || t("ai_default") || "मौसम पर ध्यान रखें।";
-      document.getElementById("ai-advisory-sub").textContent =
-        `${t("risk_card") || "Crop Risk"}: ${risks[0]?.max_severity_label || "Low"} — ${t("ai_care") || "अपनी फसल की देखभाल करें।"}`;
-    }
+    // AI advisory — always update
+    document.getElementById("ai-advisory-text").textContent =
+      data.ai_advisory || todayRisks[0]?.advisory || t("ai_default") || "मौसम पर ध्यान रखें।";
+    document.getElementById("ai-advisory-sub").textContent =
+      `${t("risk_card") || "Crop Risk"}: ${risks[0]?.max_severity_label || "Low"} — ${t("ai_care") || "अपनी फसल की देखभाल करें।"}`;
 
     document.getElementById("last-updated").textContent =
       new Date().toLocaleTimeString("en-IN", {hour:"2-digit", minute:"2-digit"}) + " " + (t("updated") || "बजे अपडेट हुआ");
