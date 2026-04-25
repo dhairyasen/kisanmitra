@@ -540,8 +540,19 @@ function updateSevenDayStrip(forecast, schedule) {
       : `<span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded-lg">${t("sinchai") || t("irrigate") || "सिंचाई"}</span>`;
 
     const date = new Date(day.date);
-    const localeLang = {"hi":"hi-IN","mr":"mr-IN","kn":"kn-IN","te":"te-IN","ta":"ta-IN","pa":"pa-IN","bn":"bn-IN","en":"en-IN"}[language] || "hi-IN";
-    const dayLabel = i === 0 ? (t("today") || "आज") : date.toLocaleDateString(localeLang, {weekday:"short"});
+    const DAY_NAMES_LANG = {
+      hi: ["रवि","सोम","मंगल","बुध","गुरु","शुक्र","शनि"],
+      mr: ["रवि","सोम","मंगळ","बुध","गुरु","शुक्र","शनि"],
+      kn: ["ಭಾನು","ಸೋಮ","ಮಂಗಳ","ಬುಧ","ಗುರು","ಶುಕ್ರ","ಶನಿ"],
+      te: ["ఆది","సోమ","మంగళ","బుధ","గురు","శుక్ర","శని"],
+      ta: ["ஞாயி","திங்","செவ்","புத","வியா","வெள்","சனி"],
+      pa: ["ਐਤ","ਸੋਮ","ਮੰਗਲ","ਬੁੱਧ","ਵੀਰ","ਸ਼ੁੱਕਰ","ਸ਼ਨਿੱਚਰ"],
+      bn: ["রবি","সোম","মঙ্গল","বুধ","বৃহ","শুক্র","শনি"],
+      en: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+    };
+    const currentLang = sessionStorage.getItem("language") || "hi";
+    const dayNames = DAY_NAMES_LANG[currentLang] || DAY_NAMES_LANG["hi"];
+    const dayLabel = i === 0 ? (t("today") || "आज") : dayNames[date.getDay()];
     const dateLabel = date.toLocaleDateString("en-IN", {day:"numeric", month:"short"});
 
     strip.innerHTML += `
