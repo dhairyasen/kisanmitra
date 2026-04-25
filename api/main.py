@@ -116,13 +116,34 @@ def get_full_advisory(req: AdvisoryRequest):
     """
     Master advisory endpoint.
     Returns weather + risks + irrigation in one call.
+    Supports language parameter for multilingual responses.
     """
+    from models.risk_classifier import classify_risk_translated
+    from utils.translations import get_translation, get_weather_message, get_weather_advice
+
     weather = fetch_open_meteo(req.lat, req.lon, days=7)
     if not weather:
         raise HTTPException(status_code=503, detail="Cannot fetch weather data.")
 
+    lang = req.language.value if req.language else "hi"
     daily = weather.get("daily_forecast", [])
-    risks = batch_classify(req.crop.value, req.growth_stage.value, daily)
+
+    # Use translated risk classifier
+    risks = []
+    for day in daily:
+        result = classify_risk_translated(
+            crop=req.crop.value,
+            growth_stage=req.growth_stage.value,
+            temp_min_c=day.get("temp_min_c"),
+            temp_max_c=day.get("temp_max_c"),
+            rainfall_mm=day.get("rainfall_mm", 0),
+            wind_kmh=day.get("wind_max_kmh", 0),
+            rainfall_prob_pct=day.get("rainfall_prob_pct", 0),
+            language=lang
+        )
+        result["date"] = day.get("date")
+        risks.append(result)
+
     irrigation = get_irrigation_schedule(
         crop=req.crop.value,
         growth_stage=req.growth_stage.value,
@@ -132,13 +153,23 @@ def get_full_advisory(req: AdvisoryRequest):
     )
     profile = get_crop_profile(req.crop.value)
 
+    # Get weather messages in selected language
+    today = daily[0] if daily else {}
+    weather_msg = get_weather_message(lang, today.get("temp_max_c", 25), today.get("rainfall_mm", 0), today.get("wind_max_kmh", 0))
+    weather_advice = get_weather_advice(lang, today.get("temp_max_c", 25), today.get("rainfall_mm", 0), today.get("wind_max_kmh", 0))
+    ai_advisory = get_translation(lang, "ai_advisory")
+
     return {
         "status": "ok",
         "crop": req.crop.value,
         "crop_hi": profile["name_hi"],
         "growth_stage": req.growth_stage.value,
+        "language": lang,
         "location": {"lat": req.lat, "lon": req.lon},
         "weather_forecast": daily,
+        "weather_message": weather_msg,
+        "weather_advice": weather_advice,
+        "ai_advisory": ai_advisory,
         "risk_assessment": risks,
         "irrigation_schedule": irrigation["schedule"],
         "irrigation_summary": irrigation["summary"],

@@ -179,3 +179,107 @@ def batch_classify(crop: str, growth_stage: str, daily_forecast: list) -> list:
         result["date"] = day.get("date")
         results.append(result)
     return results
+
+
+def classify_risk_translated(
+    crop: str,
+    growth_stage: str,
+    temp_min_c: float,
+    temp_max_c: float,
+    rainfall_mm: float,
+    wind_kmh: float,
+    rainfall_prob_pct: float,
+    language: str = "hi",
+    soil_saturation_index: float = 0.5
+) -> dict:
+    """
+    Same as classify_risk but returns advisory in requested language.
+    """
+    import sys
+    sys.path.insert(0, '.')
+    from utils.translations import get_translation
+
+    try:
+        profile = get_crop_profile(crop)
+    except ValueError as e:
+        return {"error": str(e)}
+
+    risks = []
+    crop_hi = profile["name_hi"]
+
+    # Heatwave
+    if temp_max_c is not None and temp_max_c > profile["heatwave_temp_c"]:
+        severity = _heat_severity(temp_max_c, profile["heatwave_temp_c"])
+        advisory = get_translation(language, "heat_advisory",
+                                   temp=temp_max_c, crop=crop_hi)
+        risks.append({
+            "type": "heatwave",
+            "severity": severity,
+            "severity_label": SEVERITY_LABELS[severity],
+            "detected_value": f"{temp_max_c}°C",
+            "threshold": f"{profile['heatwave_temp_c']}°C",
+            "advisory": advisory
+        })
+
+    # Frost
+    if temp_min_c is not None and temp_min_c < profile["frost_risk_temp_c"]:
+        severity = _frost_severity(temp_min_c, profile["frost_risk_temp_c"], growth_stage)
+        advisory = get_translation(language, "frost_advisory",
+                                   temp=temp_min_c, crop=crop_hi)
+        risks.append({
+            "type": "frost",
+            "severity": severity,
+            "severity_label": SEVERITY_LABELS[severity],
+            "detected_value": f"{temp_min_c}°C",
+            "threshold": f"{profile['frost_risk_temp_c']}°C",
+            "advisory": advisory
+        })
+
+    # Excess Rain
+    if rainfall_mm is not None and rainfall_mm > profile["max_rain_mm_day"]:
+        severity = _rain_severity(rainfall_mm, profile["max_rain_mm_day"])
+        advisory = get_translation(language, "rain_advisory",
+                                   rain=rainfall_mm, crop=crop_hi)
+        risks.append({
+            "type": "excess_rain",
+            "severity": severity,
+            "severity_label": SEVERITY_LABELS[severity],
+            "detected_value": f"{rainfall_mm}mm",
+            "threshold": f"{profile['max_rain_mm_day']}mm",
+            "advisory": advisory
+        })
+
+    # High Wind
+    if wind_kmh is not None and wind_kmh > profile["wind_risk_kmh"]:
+        severity = _wind_severity(wind_kmh, profile["wind_risk_kmh"])
+        advisory = get_translation(language, "wind_advisory",
+                                   wind=wind_kmh)
+        risks.append({
+            "type": "high_wind",
+            "severity": severity,
+            "severity_label": SEVERITY_LABELS[severity],
+            "detected_value": f"{wind_kmh}km/h",
+            "threshold": f"{profile['wind_risk_kmh']}km/h",
+            "advisory": advisory
+        })
+
+    risks.sort(key=lambda x: x["severity"], reverse=True)
+    max_severity = risks[0]["severity"] if risks else 0
+
+    result = {
+        "crop": crop,
+        "crop_hi": crop_hi,
+        "growth_stage": growth_stage,
+        "risks": risks,
+        "max_severity": max_severity,
+        "max_severity_label": SEVERITY_LABELS.get(max_severity, "कोई नहीं"),
+        "alert_required": max_severity >= 3,
+        "emergency": max_severity >= 5,
+        "total_risks_detected": len(risks),
+        "language": language
+    }
+
+    if not risks:
+        result["message"] = get_translation(language, "no_risk")
+
+    return result
