@@ -69,7 +69,7 @@
   <div class="card border-l-4 border-blue-500">
     <div class="flex justify-between items-start">
       <div class="flex-1">
-        <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-2">🌤️ आज का मौसम</div>
+        <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-2" id="weather-card-header">🌤️ <span id="wch-text">आज का मौसम</span></div>
         <div class="text-4xl font-bold text-gray-900 mb-3" id="weather-main-text">गर्मी अधिक रहेगी</div>
         <div class="flex gap-3 flex-wrap mb-3">
           <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-sm font-semibold" id="temp-display">🌡️ --°C</span>
@@ -90,7 +90,7 @@
         <div style="width:260px;height:120px;position:relative">
           <canvas id="rainfallChart" style="width:260px!important;height:120px!important"></canvas>
         </div>
-        <div class="text-xs text-gray-400 text-right mt-1">अगले 7 दिन</div>
+        <div class="text-xs text-gray-400 text-right mt-1" id="chart-label">अगले 7 दिन</div>
       </div>
     </div>
   </div>
@@ -100,7 +100,7 @@
 
     <!-- Risk Card -->
     <div class="card border-l-4" id="risk-card-border">
-      <div class="text-xs font-bold uppercase tracking-wider mb-2" id="risk-header-text">⚠️ फसल को खतरा</div>
+      <div class="text-xs font-bold uppercase tracking-wider mb-2" id="risk-header-text">⚠️ <span id="rch-text">फसल को खतरा</span></div>
       <div class="inline-block px-3 py-1 rounded-full text-white text-sm font-bold mb-2" id="risk-badge">Loading...</div>
       <div class="mb-2">
         <div class="text-xs text-gray-500 mb-1">खतरा मीटर:</div>
@@ -118,7 +118,7 @@
 
     <!-- Irrigation Card -->
     <div class="card border-l-4 border-blue-400">
-      <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-2">💧 सिंचाई की सलाह</div>
+      <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-2">💧 <span id="ich-text">सिंचाई की सलाह</span></div>
       <div class="w-full py-2 rounded-lg text-center text-white font-bold text-sm mb-3" id="irrigation-badge">Loading...</div>
       <div class="space-y-2">
         <div class="flex items-center gap-2 text-sm text-gray-700">
@@ -137,7 +137,7 @@
 
     <!-- Fasal Ki Sehat Card -->
     <div class="card border-l-4 border-green-500">
-      <div class="text-green-600 text-xs font-bold uppercase tracking-wider mb-2">🌱 फसल की सेहत</div>
+      <div class="text-green-600 text-xs font-bold uppercase tracking-wider mb-2">🌱 <span id="hch-text">फसल की सेहत</span></div>
       <div class="text-2xl font-bold mb-1" id="health-text">फसल ठीक है</div>
       <div class="text-gray-500 text-sm mb-3" id="health-subtext">कोई बड़ी समस्या नहीं</div>
       <div class="flex justify-between items-center text-sm mb-1">
@@ -155,7 +155,7 @@
 
   <!-- 7-Day Strip -->
   <div class="card">
-    <div class="text-purple-700 text-xs font-bold uppercase tracking-wider mb-3">📅 अगले 7 दिन का अनुमान</div>
+    <div class="text-purple-700 text-xs font-bold uppercase tracking-wider mb-3">📅 <span id="sdh-text">अगले 7 दिन का अनुमान</span></div>
     <div class="flex gap-3 overflow-x-auto pb-2" id="seven-day-strip">
       <!-- Populated by JS -->
     </div>
@@ -167,7 +167,7 @@
       <div class="text-4xl">🤖</div>
       <div class="flex-1">
         <div class="text-green-300 text-xs font-bold uppercase tracking-wider mb-2">
-          🤖 AI &nbsp; किसानमित्र AI की सलाह
+          🤖 AI &nbsp; <span id="ach-text">किसानमित्र AI की सलाह</span>
         </div>
         <div class="text-xl font-bold leading-snug mb-1" id="ai-advisory-text">
           सही समय पर सिंचाई करें और उपज बढ़ाएं।
@@ -347,25 +347,32 @@ function applyUILanguage() {
   const el = (id) => document.getElementById(id);
   const setText = (id, key) => { const e = el(id); if(e) e.textContent = t(key); };
 
-  // Card headers
-  document.querySelectorAll(".weather-card-header").forEach(e => e.textContent = t("weather_card"));
-  document.querySelectorAll(".risk-card-header").forEach(e => e.textContent = t("risk_card"));
-  document.querySelectorAll(".irrigation-card-header").forEach(e => e.textContent = t("irrigation_card"));
-  document.querySelectorAll(".health-card-header").forEach(e => e.textContent = t("health_card"));
-  document.querySelectorAll(".seven-day-header").forEach(e => e.textContent = t("seven_day"));
-  document.querySelectorAll(".ai-card-header").forEach(e => e.textContent = t("ai_card"));
+  const sid = (id) => document.getElementById(id);
+  const setText = (id, key) => { const e = sid(id); if(e) e.textContent = t(key); };
 
-  // Buttons
-  document.querySelectorAll(".pump-btn").forEach(e => e.textContent = "⚡ " + t("pump"));
-  document.querySelectorAll(".full-report-btn").forEach(e => e.textContent = t("full_report") + " ↗");
-  document.querySelectorAll(".aur-jaankari").forEach(e => e.textContent = t("aur_jaankari"));
-  document.querySelectorAll(".khatra-meter-label").forEach(e => e.textContent = t("khatra_meter"));
+  // Card headers using IDs
+  setText("wch-text", "weather_card");
+  setText("rch-text", "risk_card");
+  setText("ich-text", "irrigation_card");
+  setText("hch-text", "health_card");
+  setText("sdh-text", "seven_day");
+  setText("ach-text", "ai_card");
+  setText("chart-label", "seven_day");
+  setText("health-score-label", "health_score");
 
   // Loading/error states
   const loadingText = document.querySelector("#loading-state .text-green-800");
   if(loadingText) loadingText.textContent = t("loading");
   const loadingSub = document.querySelector("#loading-state .text-gray-500");
   if(loadingSub) loadingSub.textContent = t("loading_sub");
+  
+  // Error state
+  const errorTitle = document.querySelector("#error-state .text-red-700");
+  if(errorTitle) errorTitle.textContent = t("error");
+  const errorSub = document.querySelector("#error-state .text-gray-500");
+  if(errorSub) errorSub.textContent = t("error_sub");
+  const retryBtn = document.querySelector("#error-state button");
+  if(retryBtn) retryBtn.textContent = t("retry");
 }
 
 const WEATHER_MESSAGES = {
