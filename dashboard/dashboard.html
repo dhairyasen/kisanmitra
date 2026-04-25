@@ -27,7 +27,7 @@
     <span class="text-2xl">🌾</span>
     <div>
       <div class="text-lg font-bold leading-tight">KisanMitra</div>
-      <div class="text-xs text-green-300 leading-tight">हर किसान का साथी</div>
+      <div class="text-xs text-green-300 leading-tight" id="navbar-subtitle">हर किसान का साथी</div>
     </div>
   </div>
   <div class="flex items-center gap-2">
@@ -81,7 +81,7 @@
   <div class="card border-l-4 border-blue-500">
     <div class="flex justify-between items-start">
       <div class="flex-1">
-        <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-2">🌤️ आज का मौसम</div>
+        <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-2" id="weather-card-title">🌤️ <span class="weather-card-header">आज का मौसम</span></div>
         <div class="text-4xl font-bold text-gray-900 mb-3" id="weather-main-text">गर्मी अधिक रहेगी</div>
         <div class="flex gap-3 flex-wrap mb-3">
           <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-sm font-semibold" id="temp-display">🌡️ --°C</span>
@@ -98,11 +98,11 @@
         </div>
       </div>
       <div class="ml-4" style="width:260px;min-width:260px;max-width:260px">
-        <div class="text-xs text-gray-500 font-semibold mb-1 text-center">बारिश की संभावना</div>
+        <div class="text-xs text-gray-500 font-semibold mb-1 text-center" id="rainfall-chart-label">बारिश की संभावना</div>
         <div style="width:260px;height:120px;position:relative">
           <canvas id="rainfallChart" style="width:260px!important;height:120px!important"></canvas>
         </div>
-        <div class="text-xs text-gray-400 text-right mt-1">अगले 7 दिन</div>
+        <div class="text-xs text-gray-400 text-right mt-1" id="next7days-label">अगले 7 दिन</div>
       </div>
     </div>
   </div>
@@ -112,10 +112,10 @@
 
     <!-- Risk Card -->
     <div class="card border-l-4" id="risk-card-border">
-      <div class="text-xs font-bold uppercase tracking-wider mb-2" id="risk-header-text">⚠️ फसल को खतरा</div>
+      <div class="text-xs font-bold uppercase tracking-wider mb-2" id="risk-header-text">⚠️ <span class="risk-card-header">फसल को खतरा</span></div>
       <div class="inline-block px-3 py-1 rounded-full text-white text-sm font-bold mb-2" id="risk-badge">Loading...</div>
       <div class="mb-2">
-        <div class="text-xs text-gray-500 mb-1">खतरा मीटर:</div>
+        <div class="text-xs text-gray-500 mb-1 khatra-meter-label">खतरा मीटर:</div>
         <div class="flex gap-1" id="khatra-meter">
           <span class="text-gray-300 text-lg">●</span>
           <span class="text-gray-300 text-lg">●</span>
@@ -130,7 +130,7 @@
 
     <!-- Irrigation Card -->
     <div class="card border-l-4 border-blue-400">
-      <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-2">💧 सिंचाई की सलाह</div>
+      <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-2">💧 <span class="irrigation-card-header">सिंचाई की सलाह</span></div>
       <div class="w-full py-2 rounded-lg text-center text-white font-bold text-sm mb-3" id="irrigation-badge">Loading...</div>
       <div class="space-y-2">
         <div class="flex items-center gap-2 text-sm text-gray-700">
@@ -142,18 +142,18 @@
           <span id="irrigation-volume">--</span>
         </div>
       </div>
-      <button class="w-full mt-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold text-sm transition-colors" id="pump-btn">
+      <button class="w-full mt-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold text-sm transition-colors pump-btn" id="pump-btn">
         ⚡ पंप चलाएं
       </button>
     </div>
 
     <!-- Fasal Ki Sehat Card -->
     <div class="card border-l-4 border-green-500">
-      <div class="text-green-600 text-xs font-bold uppercase tracking-wider mb-2">🌱 फसल की सेहत</div>
+      <div class="text-green-600 text-xs font-bold uppercase tracking-wider mb-2">🌱 <span class="health-card-header">फसल की सेहत</span></div>
       <div class="text-2xl font-bold mb-1" id="health-text">फसल ठीक है</div>
       <div class="text-gray-500 text-sm mb-3" id="health-subtext">कोई बड़ी समस्या नहीं</div>
       <div class="flex justify-between items-center text-sm mb-1">
-        <span class="text-gray-600"><span id="health-score-label">स्वास्थ्य स्कोर</span></span>
+        <span class="text-gray-600"><span id="health-score-label" class="health-score-label">स्वास्थ्य स्कोर</span></span>
         <span class="font-bold" id="health-score">80%</span>
       </div>
       <div class="w-full bg-gray-100 rounded-full h-3 mb-3">
@@ -167,7 +167,7 @@
 
   <!-- 7-Day Strip -->
   <div class="card">
-    <div class="text-purple-700 text-xs font-bold uppercase tracking-wider mb-3">📅 अगले 7 दिन का अनुमान</div>
+    <div class="text-purple-700 text-xs font-bold uppercase tracking-wider mb-3">📅 <span class="seven-day-header">अगले 7 दिन का अनुमान</span></div>
     <div class="flex gap-3 overflow-x-auto pb-2" id="seven-day-strip">
       <!-- Populated by JS -->
     </div>
@@ -179,7 +179,7 @@
       <div class="text-4xl">🤖</div>
       <div class="flex-1">
         <div class="text-green-300 text-xs font-bold uppercase tracking-wider mb-2">
-          🤖 AI &nbsp; किसानमित्र AI की सलाह
+          🤖 AI &nbsp; <span class="ai-card-header">किसानमित्र AI की सलाह</span>
         </div>
         <div class="text-xl font-bold leading-snug mb-1" id="ai-advisory-text">
           सही समय पर सिंचाई करें और उपज बढ़ाएं।
@@ -190,7 +190,7 @@
         <div class="text-green-400 text-xs mt-2">- आपका किसानमित्र सहायक</div>
       </div>
       <button onclick="window.location.href='index.html'"
-        class="bg-white text-green-900 font-bold text-sm px-4 py-2 rounded-xl hover:bg-green-50 transition-colors whitespace-nowrap">
+        class="bg-white text-green-900 font-bold text-sm px-4 py-2 rounded-xl hover:bg-green-50 transition-colors whitespace-nowrap full-report-btn">
         पूरी रिपोर्ट देखें ↗
       </button>
     </div>
@@ -212,11 +212,11 @@
 <div class="fixed bottom-0 w-full bg-white border-t border-gray-100 flex justify-around py-3 z-50 md:hidden">
   <button class="flex flex-col items-center text-green-800 font-medium text-xs">
     <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">dashboard</span>
-    डैशबोर्ड
+    <span id="nav-dashboard">डैशबोर्ड</span>
   </button>
   <button class="flex flex-col items-center text-gray-400 text-xs" onclick="window.location.href='index.html'">
     <span class="material-symbols-outlined">cloud</span>
-    मौसम
+    <span id="nav-weather">मौसम</span>
   </button>
 </div>
 
@@ -253,7 +253,8 @@ const UI_TEXT = {
     advice_hot: "☀️ आज बहुत गर्मी पड़ेगी — फसल को सुबह 5-7 बजे सिंचाई करें", advice_rain: "☁️ आज बारिश की संभावना है — सिंचाई बंद रखें और नालियां साफ करें", advice_wind: "💨 तेज हवा के कारण आज कीटनाशक का छिड़काव न करें", advice_normal: "✅ आज मौसम ठीक है — फसल की नियमित देखभाल करें",
     no_risk: "आज कोई मौसम खतरा नहीं — फसल सुरक्षित है", irr_skip_timing: "बारिश आने वाली है — पंप बंद रखें", irr_skip_vol: "आज पानी देने की जरूरत नहीं", irr_reduce_timing: "सुबह 5-7 बजे — थोड़ा पानी",
     health_warn_next: "कल सुबह फसल की जांच करें।", health_danger_next: "अभी अपने खेत में जाएं।", breadcrumb_suffix: "आज की सलाह",
-    ai_default: "मौसम पर ध्यान रखें।", ai_care: "अपनी फसल की देखभाल करें।", threshold: "सीमा", risk_default_msg: "मौसम पर ध्यान रखें"
+    ai_default: "मौसम पर ध्यान रखें।", ai_care: "अपनी फसल की देखभाल करें।", threshold: "सीमा", risk_default_msg: "मौसम पर ध्यान रखें",
+    rainfall_chart_label: "बारिश की संभावना", next7days: "अगले 7 दिन", navbar_subtitle: "हर किसान का साथी", nav_dashboard: "डैशबोर्ड", nav_weather: "मौसम"
   },
   mr: {
     weather_card: "आजचे हवामान", risk_card: "पिकाला धोका", irrigation_card: "सिंचनाचा सल्ला",
@@ -268,7 +269,8 @@ const UI_TEXT = {
     loading: "हवामान माहिती घेत आहोत...", loading_sub: "तुमच्या पिकासाठी सल्ला तयार होत आहे",
     error: "डेटा लोड झाला नाही", error_sub: "इंटरनेट कनेक्शन तपासा", retry: "पुन्हा प्रयत्न करा",
     khatra_meter: "धोका मीटर:", aur_jaankari: "अधिक माहिती →",
-    today: "आज", band: "बंद", sinchai: "सिंचन", weather_hot: "उष्णता जास्त असेल 🔆", weather_rain: "पाऊस पडण्याची शक्यता ☁️", weather_cold: "थंडीचा अंदाज ❄️", weather_wind: "जोरदार वारा वाहील 💨", weather_normal: "हवामान ठीक राहील ✅", advice_hot: "☀️ आज खूप उष्णता असेल — पिकाला सकाळी 5-7 वाजता पाणी द्या", advice_rain: "☁️ आज पावसाची शक्यता आहे — सिंचन बंद ठेवा", advice_wind: "💨 जोरदार वाऱ्यामुळे कीटकनाशक फवारू नका", advice_normal: "✅ आज हवामान ठीक आहे — पिकाची काळजी घ्या", no_risk: "आज कोणताही हवामान धोका नाही — पीक सुरक्षित आहे", irr_skip_timing: "पाऊस येणार आहे — पंप बंद ठेवा", irr_skip_vol: "आज पाणी देण्याची गरज नाही", irr_reduce_timing: "सकाळी 5-7 वाजेच्या दरम्यान — थोडे पाणी", health_warn_next: "उद्या सकाळी पिकाची तपासणी करा.", health_danger_next: "आत्ता शेतात जा.", breadcrumb_suffix: "आजचा सल्ला", ai_default: "हवामानावर लक्ष ठेवा.", ai_care: "पिकाची काळजी घ्या.", threshold: "मर्यादा", risk_default_msg: "हवामानावर लक्ष ठेवा"
+    today: "आज", band: "बंद", sinchai: "सिंचन", weather_hot: "उष्णता जास्त असेल 🔆", weather_rain: "पाऊस पडण्याची शक्यता ☁️", weather_cold: "थंडीचा अंदाज ❄️", weather_wind: "जोरदार वारा वाहील 💨", weather_normal: "हवामान ठीक राहील ✅", advice_hot: "☀️ आज खूप उष्णता असेल — पिकाला सकाळी 5-7 वाजता पाणी द्या", advice_rain: "☁️ आज पावसाची शक्यता आहे — सिंचन बंद ठेवा", advice_wind: "💨 जोरदार वाऱ्यामुळे कीटकनाशक फवारू नका", advice_normal: "✅ आज हवामान ठीक आहे — पिकाची काळजी घ्या", no_risk: "आज कोणताही हवामान धोका नाही — पीक सुरक्षित आहे", irr_skip_timing: "पाऊस येणार आहे — पंप बंद ठेवा", irr_skip_vol: "आज पाणी देण्याची गरज नाही", irr_reduce_timing: "सकाळी 5-7 वाजेच्या दरम्यान — थोडे पाणी", health_warn_next: "उद्या सकाळी पिकाची तपासणी करा.", health_danger_next: "आत्ता शेतात जा.", breadcrumb_suffix: "आजचा सल्ला", ai_default: "हवामानावर लक्ष ठेवा.", ai_care: "पिकाची काळजी घ्या.", threshold: "मर्यादा", risk_default_msg: "हवामानावर लक्ष ठेवा",
+    rainfall_chart_label: "पावसाची शक्यता", next7days: "पुढील 7 दिवस", navbar_subtitle: "प्रत्येक शेतकऱ्याचा साथी", nav_dashboard: "डैशबोर्ड", nav_weather: "हवामान"
   },
   kn: {
     weather_card: "ಇಂದಿನ ಹವಾಮಾನ", risk_card: "ಬೆಳೆಗೆ ಅಪಾಯ", irrigation_card: "ನೀರಾವರಿ ಸಲಹೆ",
@@ -283,7 +285,8 @@ const UI_TEXT = {
     loading: "ಹವಾಮಾನ ಮಾಹಿತಿ ತರುತ್ತಿದ್ದೇವೆ...", loading_sub: "ನಿಮ್ಮ ಬೆಳೆಗೆ ಸಲಹೆ ತಯಾರಾಗುತ್ತಿದೆ",
     error: "ಡೇಟಾ ಲೋಡ್ ಆಗಲಿಲ್ಲ", error_sub: "ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ", retry: "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
     khatra_meter: "ಅಪಾಯ ಮೀಟರ್:", aur_jaankari: "ಹೆಚ್ಚಿನ ಮಾಹಿತಿ →",
-    today: "ಇಂದು", band: "ನಿಲ್ಲಿಸಿ", sinchai: "ನೀರಾವರಿ", weather_hot: "ಹೆಚ್ಚು ಬಿಸಿಲು ಇರುತ್ತದೆ 🔆", weather_rain: "ಮಳೆಯ ಸಾಧ್ಯತೆ ☁️", weather_cold: "ಚಳಿಯ ಅವಕಾಶ ❄️", weather_wind: "ಜೋರು ಗಾಳಿ ಬೀಸುತ್ತದೆ 💨", weather_normal: "ಹವಾಮಾನ ಸರಿಯಾಗಿರುತ್ತದೆ ✅", advice_hot: "☀️ ಇಂದು ತುಂಬಾ ಬಿಸಿಲು — ಬೆಳಿಗ್ಗೆ 5-7 ಗಂಟೆಗೆ ನೀರು ಹಾಕಿ", advice_rain: "☁️ ಮಳೆ ನಿರೀಕ್ಷೆ — ನೀರಾವರಿ ನಿಲ್ಲಿಸಿ", advice_wind: "💨 ಜೋರು ಗಾಳಿ — ಕೀಟನಾಶಕ ಸಿಂಪಡಿಸಬೇಡಿ", advice_normal: "✅ ಹವಾಮಾನ ಸರಿಯಾಗಿದೆ — ಬೆಳೆ ಆರೈಕೆ ಮಾಡಿ", no_risk: "ಇಂದು ಯಾವುದೇ ಅಪಾಯವಿಲ್ಲ — ಬೆಳೆ ಸುರಕ್ಷಿತ", irr_skip_timing: "ಮಳೆ ಬರಲಿದೆ — ಪಂಪ್ ಆಫ್ ಮಾಡಿ", irr_skip_vol: "ಇಂದು ನೀರು ಬೇಡ", irr_reduce_timing: "ಬೆಳಿಗ್ಗೆ 5-7 — ಸ್ವಲ್ಪ ನೀರು", health_warn_next: "ನಾಳೆ ಬೆಳಿಗ್ಗೆ ಬೆಳೆ ಪರೀಕ್ಷಿಸಿ.", health_danger_next: "ಈಗಲೇ ಹೊಲಕ್ಕೆ ಹೋಗಿ.", breadcrumb_suffix: "ಇಂದಿನ ಸಲಹೆ", ai_default: "ಹವಾಮಾನ ಗಮನಿಸಿ.", ai_care: "ಬೆಳೆ ಆರೈಕೆ ಮಾಡಿ.", threshold: "ಮಿತಿ", risk_default_msg: "ಹವಾಮಾನ ಗಮನಿಸಿ"
+    today: "ಇಂದು", band: "ನಿಲ್ಲಿಸಿ", sinchai: "ನೀರಾವರಿ", weather_hot: "ಹೆಚ್ಚು ಬಿಸಿಲು ಇರುತ್ತದೆ 🔆", weather_rain: "ಮಳೆಯ ಸಾಧ್ಯತೆ ☁️", weather_cold: "ಚಳಿಯ ಅವಕಾಶ ❄️", weather_wind: "ಜೋರು ಗಾಳಿ ಬೀಸುತ್ತದೆ 💨", weather_normal: "ಹವಾಮಾನ ಸರಿಯಾಗಿರುತ್ತದೆ ✅", advice_hot: "☀️ ಇಂದು ತುಂಬಾ ಬಿಸಿಲು — ಬೆಳಿಗ್ಗೆ 5-7 ಗಂಟೆಗೆ ನೀರು ಹಾಕಿ", advice_rain: "☁️ ಮಳೆ ನಿರೀಕ್ಷೆ — ನೀರಾವರಿ ನಿಲ್ಲಿಸಿ", advice_wind: "💨 ಜೋರು ಗಾಳಿ — ಕೀಟನಾಶಕ ಸಿಂಪಡಿಸಬೇಡಿ", advice_normal: "✅ ಹವಾಮಾನ ಸರಿಯಾಗಿದೆ — ಬೆಳೆ ಆರೈಕೆ ಮಾಡಿ", no_risk: "ಇಂದು ಯಾವುದೇ ಅಪಾಯವಿಲ್ಲ — ಬೆಳೆ ಸುರಕ್ಷಿತ", irr_skip_timing: "ಮಳೆ ಬರಲಿದೆ — ಪಂಪ್ ಆಫ್ ಮಾಡಿ", irr_skip_vol: "ಇಂದು ನೀರು ಬೇಡ", irr_reduce_timing: "ಬೆಳಿಗ್ಗೆ 5-7 — ಸ್ವಲ್ಪ ನೀರು", health_warn_next: "ನಾಳೆ ಬೆಳಿಗ್ಗೆ ಬೆಳೆ ಪರೀಕ್ಷಿಸಿ.", health_danger_next: "ಈಗಲೇ ಹೊಲಕ್ಕೆ ಹೋಗಿ.", breadcrumb_suffix: "ಇಂದಿನ ಸಲಹೆ", ai_default: "ಹವಾಮಾನ ಗಮನಿಸಿ.", ai_care: "ಬೆಳೆ ಆರೈಕೆ ಮಾಡಿ.", threshold: "ಮಿತಿ", risk_default_msg: "ಹವಾಮಾನ ಗಮನಿಸಿ",
+    rainfall_chart_label: "ಮಳೆಯ ಸಾಧ್ಯತೆ", next7days: "ಮುಂದಿನ 7 ದಿನಗಳು", navbar_subtitle: "ಪ್ರತಿ ರೈತನ ಸ್ನೇಹಿತ", nav_dashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್", nav_weather: "ಹವಾಮಾನ"
   },
   te: {
     weather_card: "ఈరోజు వాతావరణం", risk_card: "పంటకు ప్రమాదం", irrigation_card: "నీటిపారుదల సలహా",
@@ -298,7 +301,8 @@ const UI_TEXT = {
     loading: "వాతావరణ సమాచారం తీసుకుంటున్నాం...", loading_sub: "మీ పంటకు సలహా సిద్ధమవుతోంది",
     error: "డేటా లోడ్ కాలేదు", error_sub: "ఇంటర్నెట్ కనెక్షన్ తనిఖీ చేయండి", retry: "మళ్ళీ ప్రయత్నించండి",
     khatra_meter: "ప్రమాద మీటర్:", aur_jaankari: "మరింత సమాచారం →",
-    today: "ఈరోజు", band: "ఆపండి", sinchai: "నీటిపారుదల", weather_hot: "ఎక్కువ వేడి ఉంటుంది 🔆", weather_rain: "వర్షం పడే అవకాశం ☁️", weather_cold: "చలి అవకాశం ❄️", weather_wind: "గాలి వేగంగా వీస్తుంది 💨", weather_normal: "వాతావరణం బాగుంటుంది ✅", advice_hot: "☀️ చాలా వేడిగా ఉంటుంది — ఉదయం 5-7 గంటలకు నీరు పెట్టండి", advice_rain: "☁️ వర్షం అవకాశం — నీటిపారుదల ఆపండి", advice_wind: "💨 గాలి వేగంగా — పురుగుమందు చల్లవద్దు", advice_normal: "✅ వాతావరణం బాగుంది — పంటను చూసుకోండి", no_risk: "ఈరోజు ప్రమాదం లేదు — పంట సురక్షితం", irr_skip_timing: "వర్షం వస్తోంది — పంపు ఆపండి", irr_skip_vol: "ఈరోజు నీరు అవసరం లేదు", irr_reduce_timing: "ఉదయం 5-7 గంటలు — కొంచెం నీరు", health_warn_next: "రేపు ఉదయం పంట పరీక్షించండి.", health_danger_next: "ఇప్పుడే పొలానికి వెళ్ళండి.", breadcrumb_suffix: "ఈరోజు సలహా", ai_default: "వాతావరణం గమనించండి.", ai_care: "పంటను జాగ్రత్తగా చూసుకోండి.", threshold: "పరిమితి", risk_default_msg: "వాతావరణం గమనించండి"
+    today: "ఈరోజు", band: "ఆపండి", sinchai: "నీటిపారుదల", weather_hot: "ఎక్కువ వేడి ఉంటుంది 🔆", weather_rain: "వర్షం పడే అవకాశం ☁️", weather_cold: "చలి అవకాశం ❄️", weather_wind: "గాలి వేగంగా వీస్తుంది 💨", weather_normal: "వాతావరణం బాగుంటుంది ✅", advice_hot: "☀️ చాలా వేడిగా ఉంటుంది — ఉదయం 5-7 గంటలకు నీరు పెట్టండి", advice_rain: "☁️ వర్షం అవకాశం — నీటిపారుదల ఆపండి", advice_wind: "💨 గాలి వేగంగా — పురుగుమందు చల్లవద్దు", advice_normal: "✅ వాతావరణం బాగుంది — పంటను చూసుకోండి", no_risk: "ఈరోజు ప్రమాదం లేదు — పంట సురక్షితం", irr_skip_timing: "వర్షం వస్తోంది — పంపు ఆపండి", irr_skip_vol: "ఈరోజు నీరు అవసరం లేదు", irr_reduce_timing: "ఉదయం 5-7 గంటలు — కొంచెం నీరు", health_warn_next: "రేపు ఉదయం పంట పరీక్షించండి.", health_danger_next: "ఇప్పుడే పొలానికి వెళ్ళండి.", breadcrumb_suffix: "ఈరోజు సలహా", ai_default: "వాతావరణం గమనించండి.", ai_care: "పంటను జాగ్రత్తగా చూసుకోండి.", threshold: "పరిమితి", risk_default_msg: "వాతావరణం గమనించండి",
+    rainfall_chart_label: "వర్షం అవకాశం", next7days: "రాబోయే 7 రోజులు", navbar_subtitle: "ప్రతి రైతు మిత్రుడు", nav_dashboard: "డాష్‌బోర్డ్", nav_weather: "వాతావరణం"
   },
   ta: {
     weather_card: "இன்றைய வானிலை", risk_card: "பயிருக்கு ஆபத்து", irrigation_card: "நீர்ப்பாசன ஆலோசனை",
@@ -313,7 +317,8 @@ const UI_TEXT = {
     loading: "வானிலை தகவல் பெறுகிறோம்...", loading_sub: "உங்கள் பயிருக்கான ஆலோசனை தயாராகிறது",
     error: "தரவு ஏற்றப்படவில்லை", error_sub: "இணைய இணைப்பை சரிபார்க்கவும்", retry: "மீண்டும் முயற்சிக்கவும்",
     khatra_meter: "ஆபத்து மீட்டர்:", aur_jaankari: "மேலும் தகவல் →",
-    today: "இன்று", band: "நிறுத்து", sinchai: "நீர்ப்பாசனம்", weather_hot: "வெப்பம் அதிகமாக இருக்கும் 🔆", weather_rain: "மழை வாய்ப்பு ☁️", weather_cold: "குளிர் வாய்ப்பு ❄️", weather_wind: "காற்று வேகமாக வீசும் 💨", weather_normal: "வானிலை சரியாக இருக்கும் ✅", advice_hot: "☀️ மிகவும் சூடாக இருக்கும் — காலை 5-7 மணிக்கு நீர் பாய்ச்சுங்கள்", advice_rain: "☁️ மழை எதிர்பார்க்கப்படுகிறது — நீர்ப்பாசனம் நிறுத்துங்கள்", advice_wind: "💨 காற்று வேகமாக — பூச்சிக்கொல்லி தெளிக்காதீர்கள்", advice_normal: "✅ வானிலை சரியாக உள்ளது — பயிரை கவனியுங்கள்", no_risk: "இன்று ஆபத்து இல்லை — பயிர் பாதுகாப்பாக உள்ளது", irr_skip_timing: "மழை வருகிறது — பம்பை அணைக்கவும்", irr_skip_vol: "இன்று தண்ணீர் தேவையில்லை", irr_reduce_timing: "காலை 5-7 மணி — கொஞ்சம் தண்ணீர்", health_warn_next: "நாளை காலை பயிரை சோதிக்கவும்.", health_danger_next: "இப்போதே வயலுக்கு செல்லுங்கள்.", breadcrumb_suffix: "இன்றைய ஆலோசனை", ai_default: "வானிலையை கவனியுங்கள்.", ai_care: "பயிரை கவனமாக பாதுகாங்கள்.", threshold: "வரம்பு", risk_default_msg: "வானிலை கண்காணியுங்கள்"
+    today: "இன்று", band: "நிறுத்து", sinchai: "நீர்ப்பாசனம்", weather_hot: "வெப்பம் அதிகமாக இருக்கும் 🔆", weather_rain: "மழை வாய்ப்பு ☁️", weather_cold: "குளிர் வாய்ப்பு ❄️", weather_wind: "காற்று வேகமாக வீசும் 💨", weather_normal: "வானிலை சரியாக இருக்கும் ✅", advice_hot: "☀️ மிகவும் சூடாக இருக்கும் — காலை 5-7 மணிக்கு நீர் பாய்ச்சுங்கள்", advice_rain: "☁️ மழை எதிர்பார்க்கப்படுகிறது — நீர்ப்பாசனம் நிறுத்துங்கள்", advice_wind: "💨 காற்று வேகமாக — பூச்சிக்கொல்லி தெளிக்காதீர்கள்", advice_normal: "✅ வானிலை சரியாக உள்ளது — பயிரை கவனியுங்கள்", no_risk: "இன்று ஆபத்து இல்லை — பயிர் பாதுகாப்பாக உள்ளது", irr_skip_timing: "மழை வருகிறது — பம்பை அணைக்கவும்", irr_skip_vol: "இன்று தண்ணீர் தேவையில்லை", irr_reduce_timing: "காலை 5-7 மணி — கொஞ்சம் தண்ணீர்", health_warn_next: "நாளை காலை பயிரை சோதிக்கவும்.", health_danger_next: "இப்போதே வயலுக்கு செல்லுங்கள்.", breadcrumb_suffix: "இன்றைய ஆலோசனை", ai_default: "வானிலையை கவனியுங்கள்.", ai_care: "பயிரை கவனமாக பாதுகாங்கள்.", threshold: "வரம்பு", risk_default_msg: "வானிலை கண்காணியுங்கள்",
+    rainfall_chart_label: "மழை வாய்ப்பு", next7days: "அடுத்த 7 நாட்கள்", navbar_subtitle: "ஒவ்வொரு விவசாயியின் நண்பன்", nav_dashboard: "டாஷ்போர்டு", nav_weather: "வானிலை"
   },
   pa: {
     weather_card: "ਅੱਜ ਦਾ ਮੌਸਮ", risk_card: "ਫ਼ਸਲ ਨੂੰ ਖ਼ਤਰਾ", irrigation_card: "ਸਿੰਚਾਈ ਦੀ ਸਲਾਹ",
@@ -328,7 +333,8 @@ const UI_TEXT = {
     loading: "ਮੌਸਮ ਦੀ ਜਾਣਕਾਰੀ ਲੈ ਰਹੇ ਹਾਂ...", loading_sub: "ਤੁਹਾਡੀ ਫ਼ਸਲ ਲਈ ਸਲਾਹ ਤਿਆਰ ਹੋ ਰਹੀ ਹੈ",
     error: "ਡੇਟਾ ਲੋਡ ਨਹੀਂ ਹੋਇਆ", error_sub: "ਇੰਟਰਨੈੱਟ ਕਨੈਕਸ਼ਨ ਜਾਂਚੋ", retry: "ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
     khatra_meter: "ਖ਼ਤਰਾ ਮੀਟਰ:", aur_jaankari: "ਹੋਰ ਜਾਣਕਾਰੀ →",
-    today: "ਅੱਜ", band: "ਬੰਦ", sinchai: "ਸਿੰਚਾਈ", weather_hot: "ਗਰਮੀ ਜ਼ਿਆਦਾ ਰਹੇਗੀ 🔆", weather_rain: "ਮੀਂਹ ਪੈਣ ਦੀ ਸੰਭਾਵਨਾ ☁️", weather_cold: "ਠੰਡ ਦਾ ਮੌਕਾ ❄️", weather_wind: "ਤੇਜ਼ ਹਵਾ ਚੱਲੇਗੀ 💨", weather_normal: "ਮੌਸਮ ਠੀਕ ਰਹੇਗਾ ✅", advice_hot: "☀️ ਅੱਜ ਬਹੁਤ ਗਰਮੀ — ਸਵੇਰੇ 5-7 ਵਜੇ ਸਿੰਚਾਈ ਕਰੋ", advice_rain: "☁️ ਮੀਂਹ ਦੀ ਸੰਭਾਵਨਾ — ਸਿੰਚਾਈ ਬੰਦ ਰੱਖੋ", advice_wind: "💨 ਤੇਜ਼ ਹਵਾ — ਕੀਟਨਾਸ਼ਕ ਨਾ ਛਿੜਕੋ", advice_normal: "✅ ਮੌਸਮ ਠੀਕ ਹੈ — ਫ਼ਸਲ ਦੀ ਦੇਖਭਾਲ ਕਰੋ", no_risk: "ਅੱਜ ਕੋਈ ਖ਼ਤਰਾ ਨਹੀਂ — ਫ਼ਸਲ ਸੁਰੱਖਿਅਤ", irr_skip_timing: "ਮੀਂਹ ਆਉਣ ਵਾਲਾ ਹੈ — ਪੰਪ ਬੰਦ", irr_skip_vol: "ਅੱਜ ਪਾਣੀ ਦੀ ਲੋੜ ਨਹੀਂ", irr_reduce_timing: "ਸਵੇਰੇ 5-7 ਵਜੇ — ਥੋੜਾ ਪਾਣੀ", health_warn_next: "ਕੱਲ੍ਹ ਫ਼ਸਲ ਦੀ ਜਾਂਚ ਕਰੋ.", health_danger_next: "ਹੁਣੇ ਖੇਤ ਵਿੱਚ ਜਾਓ.", breadcrumb_suffix: "ਅੱਜ ਦੀ ਸਲਾਹ", ai_default: "ਮੌਸਮ ਵੱਲ ਧਿਆਨ ਦਿਓ.", ai_care: "ਫ਼ਸਲ ਦੀ ਦੇਖਭਾਲ ਕਰੋ.", threshold: "ਸੀਮਾ", risk_default_msg: "ਮੌਸਮ ਵੱਲ ਧਿਆਨ ਦਿਓ"
+    today: "ਅੱਜ", band: "ਬੰਦ", sinchai: "ਸਿੰਚਾਈ", weather_hot: "ਗਰਮੀ ਜ਼ਿਆਦਾ ਰਹੇਗੀ 🔆", weather_rain: "ਮੀਂਹ ਪੈਣ ਦੀ ਸੰਭਾਵਨਾ ☁️", weather_cold: "ਠੰਡ ਦਾ ਮੌਕਾ ❄️", weather_wind: "ਤੇਜ਼ ਹਵਾ ਚੱਲੇਗੀ 💨", weather_normal: "ਮੌਸਮ ਠੀਕ ਰਹੇਗਾ ✅", advice_hot: "☀️ ਅੱਜ ਬਹੁਤ ਗਰਮੀ — ਸਵੇਰੇ 5-7 ਵਜੇ ਸਿੰਚਾਈ ਕਰੋ", advice_rain: "☁️ ਮੀਂਹ ਦੀ ਸੰਭਾਵਨਾ — ਸਿੰਚਾਈ ਬੰਦ ਰੱਖੋ", advice_wind: "💨 ਤੇਜ਼ ਹਵਾ — ਕੀਟਨਾਸ਼ਕ ਨਾ ਛਿੜਕੋ", advice_normal: "✅ ਮੌਸਮ ਠੀਕ ਹੈ — ਫ਼ਸਲ ਦੀ ਦੇਖਭਾਲ ਕਰੋ", no_risk: "ਅੱਜ ਕੋਈ ਖ਼ਤਰਾ ਨਹੀਂ — ਫ਼ਸਲ ਸੁਰੱਖਿਅਤ", irr_skip_timing: "ਮੀਂਹ ਆਉਣ ਵਾਲਾ ਹੈ — ਪੰਪ ਬੰਦ", irr_skip_vol: "ਅੱਜ ਪਾਣੀ ਦੀ ਲੋੜ ਨਹੀਂ", irr_reduce_timing: "ਸਵੇਰੇ 5-7 ਵਜੇ — ਥੋੜਾ ਪਾਣੀ", health_warn_next: "ਕੱਲ੍ਹ ਫ਼ਸਲ ਦੀ ਜਾਂਚ ਕਰੋ.", health_danger_next: "ਹੁਣੇ ਖੇਤ ਵਿੱਚ ਜਾਓ.", breadcrumb_suffix: "ਅੱਜ ਦੀ ਸਲਾਹ", ai_default: "ਮੌਸਮ ਵੱਲ ਧਿਆਨ ਦਿਓ.", ai_care: "ਫ਼ਸਲ ਦੀ ਦੇਖਭਾਲ ਕਰੋ.", threshold: "ਸੀਮਾ", risk_default_msg: "ਮੌਸਮ ਵੱਲ ਧਿਆਨ ਦਿਓ",
+    rainfall_chart_label: "ਮੀਂਹ ਦੀ ਸੰਭਾਵਨਾ", next7days: "ਅਗਲੇ 7 ਦਿਨ", navbar_subtitle: "ਹਰ ਕਿਸਾਨ ਦਾ ਸਾਥੀ", nav_dashboard: "ਡੈਸ਼ਬੋਰਡ", nav_weather: "ਮੌਸਮ"
   },
   bn: {
     weather_card: "আজকের আবহাওয়া", risk_card: "ফসলে বিপদ", irrigation_card: "সেচের পরামর্শ",
@@ -343,7 +349,8 @@ const UI_TEXT = {
     loading: "আবহাওয়ার তথ্য নেওয়া হচ্ছে...", loading_sub: "আপনার ফসলের জন্য পরামর্শ তৈরি হচ্ছে",
     error: "ডেটা লোড হয়নি", error_sub: "ইন্টারনেট সংযোগ পরীক্ষা করুন", retry: "আবার চেষ্টা করুন",
     khatra_meter: "বিপদ মিটার:", aur_jaankari: "আরও তথ্য →",
-    today: "আজ", band: "বন্ধ", sinchai: "সেচ", weather_hot: "গরম বেশি থাকবে 🔆", weather_rain: "বৃষ্টির সম্ভাবনা ☁️", weather_cold: "ঠান্ডার সুযোগ ❄️", weather_wind: "জোরে বাতাস বইবে 💨", weather_normal: "আবহাওয়া ঠিক থাকবে ✅", advice_hot: "☀️ আজ খুব গরম — সকাল 5-7 টায় সেচ দিন", advice_rain: "☁️ বৃষ্টির সম্ভাবনা — সেচ বন্ধ রাখুন", advice_wind: "💨 জোরে বাতাস — কীটনাশক স্প্রে করবেন না", advice_normal: "✅ আবহাওয়া ঠিক আছে — ফসলের যত্ন নিন", no_risk: "আজ কোনো বিপদ নেই — ফসল নিরাপদ", irr_skip_timing: "বৃষ্টি আসছে — পাম্প বন্ধ রাখুন", irr_skip_vol: "আজ পানি দেওয়ার দরকার নেই", irr_reduce_timing: "সকাল 5-7 টার মধ্যে — একটু পানি", health_warn_next: "কাল সকালে ফসল পরীক্ষা করুন.", health_danger_next: "এখনই মাঠে যান.", breadcrumb_suffix: "আজকের পরামর্শ", ai_default: "আবহাওয়া মনোযোগ দিন.", ai_care: "ফসলের যত্ন নিন.", threshold: "সীমা", risk_default_msg: "আবহাওয়া পর্যবেক্ষণ করুন"
+    today: "আজ", band: "বন্ধ", sinchai: "সেচ", weather_hot: "গরম বেশি থাকবে 🔆", weather_rain: "বৃষ্টির সম্ভাবনা ☁️", weather_cold: "ঠান্ডার সুযোগ ❄️", weather_wind: "জোরে বাতাস বইবে 💨", weather_normal: "আবহাওয়া ঠিক থাকবে ✅", advice_hot: "☀️ আজ খুব গরম — সকাল 5-7 টায় সেচ দিন", advice_rain: "☁️ বৃষ্টির সম্ভাবনা — সেচ বন্ধ রাখুন", advice_wind: "💨 জোরে বাতাস — কীটনাশক স্প্রে করবেন না", advice_normal: "✅ আবহাওয়া ঠিক আছে — ফসলের যত্ন নিন", no_risk: "আজ কোনো বিপদ নেই — ফসল নিরাপদ", irr_skip_timing: "বৃষ্টি আসছে — পাম্প বন্ধ রাখুন", irr_skip_vol: "আজ পানি দেওয়ার দরকার নেই", irr_reduce_timing: "সকাল 5-7 টার মধ্যে — একটু পানি", health_warn_next: "কাল সকালে ফসল পরীক্ষা করুন.", health_danger_next: "এখনই মাঠে যান.", breadcrumb_suffix: "আজকের পরামর্শ", ai_default: "আবহাওয়া মনোযোগ দিন.", ai_care: "ফসলের যত্ন নিন.", threshold: "সীমা", risk_default_msg: "আবহাওয়া পর্যবেক্ষণ করুন",
+    rainfall_chart_label: "বৃষ্টির সম্ভাবনা", next7days: "আগামী 7 দিন", navbar_subtitle: "প্রতিটি কৃষকের বন্ধু", nav_dashboard: "ড্যাশবোর্ড", nav_weather: "আবহাওয়া"
   },
   en: {
     weather_card: "Today's Weather", risk_card: "Crop Risk", irrigation_card: "Irrigation Advice",
@@ -362,7 +369,8 @@ const UI_TEXT = {
     advice_hot: "☀️ Very hot today — irrigate between 5-7 AM", advice_rain: "☁️ Rain expected — stop irrigation and clear drainage", advice_wind: "💨 Strong winds — avoid pesticide spraying", advice_normal: "✅ Weather is fine — carry out regular crop care",
     no_risk: "No weather risk today — your crop is safe", irr_skip_timing: "Rain incoming — keep pump off", irr_skip_vol: "No watering needed today", irr_reduce_timing: "5-7 AM — light watering only",
     health_warn_next: "Check crops tomorrow morning.", health_danger_next: "Go to your field right now.", breadcrumb_suffix: "Today's Advisory",
-    ai_default: "Monitor weather carefully.", ai_care: "Take care of your crop.", threshold: "Limit", risk_default_msg: "Monitor weather conditions"
+    ai_default: "Monitor weather carefully.", ai_care: "Take care of your crop.", threshold: "Limit", risk_default_msg: "Monitor weather conditions",
+    rainfall_chart_label: "Chance of Rain", next7days: "Next 7 Days", navbar_subtitle: "Every Farmer's Companion", nav_dashboard: "Dashboard", nav_weather: "Weather"
   }
 };
 
@@ -372,35 +380,43 @@ function t(key) {
 }
 
 function applyUILanguage() {
-  // Apply all UI text translations
-  const el = (id) => document.getElementById(id);
-  const setText = (id, key) => { const e = el(id); if(e) e.textContent = t(key); };
+  const lang = sessionStorage.getItem("language") || "hi";
+  const setText = (id, key) => { const e = document.getElementById(id); if(e) e.textContent = t(key); };
 
-  // Card headers
+  // Card headers (via class)
   document.querySelectorAll(".weather-card-header").forEach(e => e.textContent = t("weather_card"));
   document.querySelectorAll(".risk-card-header").forEach(e => e.textContent = t("risk_card"));
   document.querySelectorAll(".irrigation-card-header").forEach(e => e.textContent = t("irrigation_card"));
   document.querySelectorAll(".health-card-header").forEach(e => e.textContent = t("health_card"));
   document.querySelectorAll(".seven-day-header").forEach(e => e.textContent = t("seven_day"));
   document.querySelectorAll(".ai-card-header").forEach(e => e.textContent = t("ai_card"));
-
-  // Buttons
-  document.querySelectorAll(".pump-btn").forEach(e => e.textContent = "⚡ " + t("pump"));
-  document.querySelectorAll(".full-report-btn").forEach(e => e.textContent = t("full_report") + " ↗");
-  document.querySelectorAll(".aur-jaankari").forEach(e => e.textContent = t("aur_jaankari"));
   document.querySelectorAll(".khatra-meter-label").forEach(e => e.textContent = t("khatra_meter"));
+  document.querySelectorAll(".aur-jaankari").forEach(e => e.textContent = t("aur_jaankari"));
 
-  // Loading/error states
+  // Buttons (via class)
+  document.querySelectorAll(".full-report-btn").forEach(e => e.textContent = t("full_report") + " ↗");
+  // pump-btn textContent is set dynamically by updateIrrigationCard, skip here
+
+  // IDs
+  setText("rainfall-chart-label", "rainfall_chart_label");
+  setText("next7days-label", "next7days");
+  setText("health-score-label", "health_score");
+  setText("nav-dashboard", "nav_dashboard");
+  setText("nav-weather", "nav_weather");
+
+  // Navbar subtitle
+  const navSub = document.getElementById("navbar-subtitle");
+  if(navSub) navSub.textContent = t("navbar_subtitle") || "हर किसान का साथी";
+
+  // Loading state
   const loadingText = document.querySelector("#loading-state .text-green-800");
   if(loadingText) loadingText.textContent = t("loading");
   const loadingSub = document.querySelector("#loading-state .text-gray-500");
   if(loadingSub) loadingSub.textContent = t("loading_sub");
 
   // Error state
-  const errText = document.getElementById("error-text");
-  if(errText) errText.textContent = t("error");
-  const errSub = document.getElementById("error-sub-text");
-  if(errSub) errSub.textContent = t("error_sub");
+  setText("error-text", "error");
+  setText("error-sub-text", "error_sub");
   const retryBtn = document.getElementById("retry-btn");
   if(retryBtn) retryBtn.textContent = t("retry");
 }
