@@ -1,89 +1,194 @@
-"""
-Pydantic models for API request/response validation.
-"""
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KisanMitra - Kheti Ki Sahi Salah</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: "#00450d",
+          secondary: "#006e1c",
+          background: "#f7fbf1",
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .hero-overlay {
+    background: linear-gradient(rgba(0,69,13,0.65), rgba(0,69,13,0.65));
+  }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+</style>
+</head>
+<body class="bg-[#f7fbf1] font-['Public_Sans']">
 
-from pydantic import BaseModel, Field
-from typing import Optional, List
-from enum import Enum
+<!-- Navbar -->
+<nav class="flex justify-between items-center h-16 px-6 w-full sticky top-0 z-50 bg-green-900 text-white shadow-lg">
+  <div class="flex items-center gap-3">
+    <span class="text-2xl">🌾</span>
+    <div>
+      <div class="text-lg font-bold leading-tight">KisanMitra</div>
+      <div class="text-xs text-green-300 leading-tight">Har Kisan Ka Mausam Saathi</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2">
+    <button class="p-2 hover:bg-green-800 rounded-full transition-colors">
+      <span class="material-symbols-outlined">notifications</span>
+    </button>
+    <button class="p-2 hover:bg-green-800 rounded-full transition-colors">
+      <span class="material-symbols-outlined">account_circle</span>
+    </button>
+  </div>
+</nav>
 
-class CropEnum(str, Enum):
-    wheat = "wheat"
-    rice = "rice"
-    soybean = "soybean"
-    cotton = "cotton"
-    sugarcane = "sugarcane"
-    onion = "onion"
-    tomato = "tomato"
+<!-- Hero -->
+<section class="relative min-h-[calc(100vh-64px)] flex flex-col items-center justify-center overflow-hidden">
+  <div class="absolute inset-0 z-0">
+    <img alt="Indian Farm" class="w-full h-full object-cover"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6A5fhZfjNzypc64rk8W_M_i4UavJvH1TeWjCHMP3Y5OFF_ihtUPjJcCTrqk4P3Esphf6x3cMHnH3sIZe1qcGl0JLU3jOLs12AsDnOLXB9szU8DUOt6PqODLh_xqgrGvEmVRx9B4GNkU1nkb-Pln4yN58AyPEq2qqBwaj6a5xXxnC3WAlxVkTpiX3-092s24S_jiyNdUndYLkFGQY7bjxj7Xow0IqXkBSUxu9KlrrrlJAEHvwUMSX8HXBiDC9y3n5Ol8B6-wvpsQ"/>
+    <div class="absolute inset-0 hero-overlay"></div>
+  </div>
 
-class GrowthStageEnum(str, Enum):
-    sowing = "sowing"
-    germination = "germination"
-    nursery = "nursery"
-    transplanting = "transplanting"
-    seedling = "seedling"
-    vegetative = "vegetative"
-    tillering = "tillering"
-    squaring = "squaring"
-    flowering = "flowering"
-    grain_filling = "grain_filling"
-    pod_fill = "pod_fill"
-    boll_development = "boll_development"
-    bulb_development = "bulb_development"
-    grand_growth = "grand_growth"
-    fruiting = "fruiting"
-    ripening = "ripening"
-    maturity = "maturity"
-    harvest = "harvest"
+  <div class="relative z-10 container mx-auto px-6 py-12 flex flex-col items-center">
+    <div class="text-center mb-10">
+      <h1 class="text-white font-bold text-5xl leading-tight mb-3">Kheti Ki Sahi Salah</h1>
+      <p class="text-green-300 text-lg">Sahi Mausam Ke Saath, Har Kisan Ka Saathi.</p>
+    </div>
 
-class SoilTypeEnum(str, Enum):
-    sandy = "sandy"
-    loamy = "loamy"
-    clay = "clay"
-    black_cotton = "black-cotton"
+    <!-- Form Card -->
+    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="bg-green-50 p-2 rounded-xl">
+          <span class="material-symbols-outlined text-green-800 text-3xl" style="font-variation-settings:'FILL' 1">potted_plant</span>
+        </div>
+        <h2 class="text-green-900 font-bold text-xl">Smarter Farming Advisor</h2>
+      </div>
 
-class LanguageEnum(str, Enum):
-    hi = "hi"   # Hindi
-    mr = "mr"   # Marathi
-    kn = "kn"   # Kannada
-    te = "te"   # Telugu
-    ta = "ta"   # Tamil
-    pa = "pa"   # Punjabi
-    bn = "bn"   # Bengali
-    en = "en"   # English
+      <div class="space-y-4">
+        <!-- Location -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-600 mb-1">Apna Shehar/Zila Chunein</label>
+          <select id="location" class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-green-300 outline-none">
+            <option value="">Select Location</option>
+            <option value="19.076,72.877">Mumbai</option>
+            <option value="28.613,77.209">Delhi</option>
+            <option value="18.520,73.856">Pune</option>
+            <option value="22.719,75.857">Indore</option>
+            <option value="26.846,80.946">Lucknow</option>
+            <option value="25.594,85.137">Patna</option>
+            <option value="23.259,77.412">Bhopal</option>
+            <option value="26.912,75.787">Jaipur</option>
+            <option value="30.733,76.779">Chandigarh</option>
+            <option value="22.572,88.363">Kolkata</option>
+            <option value="21.145,79.088">Nagpur</option>
+            <option value="21.170,72.831">Surat</option>
+            <option value="23.022,72.571">Ahmedabad</option>
+            <option value="17.385,78.486">Hyderabad</option>
+            <option value="13.082,80.270">Chennai</option>
+          </select>
+        </div>
 
-class FarmerRegisterRequest(BaseModel):
-    name: str = Field(..., min_length=2, max_length=100)
-    phone: str = Field(..., pattern=r"^\+91[0-9]{10}$")
-    whatsapp: bool = True
-    language: LanguageEnum = LanguageEnum.hi
-    lat: float = Field(..., ge=8.0, le=37.0)   # India lat bounds
-    lon: float = Field(..., ge=68.0, le=97.0)   # India lon bounds
-    district: str
-    state: str
-    crop: CropEnum
-    growth_stage: GrowthStageEnum
-    field_area_acres: float = Field(..., gt=0, le=10000)
-    soil_type: SoilTypeEnum = SoilTypeEnum.loamy
+        <!-- Crop -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-600 mb-1">Apni Fasal Chunein</label>
+          <select id="crop" class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-green-300 outline-none">
+            <option value="wheat">Wheat - गेहूं</option>
+            <option value="rice">Rice - चावल</option>
+            <option value="soybean">Soybean - सोयाबीन</option>
+            <option value="cotton">Cotton - कपास</option>
+            <option value="sugarcane">Sugarcane - गन्ना</option>
+            <option value="onion">Onion - प्याज</option>
+            <option value="tomato">Tomato - टमाटर</option>
+          </select>
+        </div>
 
-class WeatherRequest(BaseModel):
-    lat: float
-    lon: float
-    days: int = Field(default=7, ge=1, le=16)
+        <!-- Growth Stage -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-600 mb-1">Fasal Ki Awastha</label>
+          <select id="stage" class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-green-300 outline-none">
+            <option value="sowing">Sowing - बुवाई</option>
+            <option value="vegetative">Vegetative - वानस्पतिक</option>
+            <option value="flowering">Flowering - फूल आना</option>
+            <option value="harvest">Harvest - कटाई</option>
+          </select>
+        </div>
 
-class AdvisoryRequest(BaseModel):
-    lat: float
-    lon: float
-    crop: CropEnum
-    growth_stage: GrowthStageEnum
-    field_area_acres: float = 1.0
-    soil_type: SoilTypeEnum = SoilTypeEnum.loamy
-    language: LanguageEnum = LanguageEnum.hi
+        <!-- Language -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-600 mb-1">Bhasha Chunein / Select Language</label>
+          <select id="language" class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-green-300 outline-none">
+            <option value="hi">Hindi - हिंदी</option>
+            <option value="mr">Marathi - मराठी</option>
+            <option value="kn">Kannada - ಕನ್ನಡ</option>
+            <option value="te">Telugu - తెలుగు</option>
+            <option value="ta">Tamil - தமிழ்</option>
+            <option value="pa">Punjabi - ਪੰਜਾਬੀ</option>
+            <option value="bn">Bengali - বাংলা</option>
+            <option value="gu">Gujarati - ગુજરાતી</option>
+          </select>
+        </div>
 
-class ChatbotRequest(BaseModel):
-    farmer_id: Optional[str] = None
-    message: str
-    language: LanguageEnum = LanguageEnum.hi
-    lat: Optional[float] = None
-    lon: Optional[float] = None
-    crop: Optional[CropEnum] = None
-    growth_stage: Optional[GrowthStageEnum] = None
+        <!-- Submit -->
+        <button onclick="getAdvisory()"
+          class="w-full h-14 bg-[#4CAF50] hover:bg-[#43a047] text-white font-bold text-lg rounded-xl shadow-lg transition-all active:scale-95 mt-2">
+          Salah Lo / Get Advisory →
+        </button>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="mt-10 flex flex-wrap justify-center gap-3">
+      <div class="bg-white/90 backdrop-blur px-5 py-2 rounded-full flex items-center gap-2 text-green-900 font-semibold shadow">
+        <span class="material-symbols-outlined text-lg">satellite_alt</span> Satellite Data
+      </div>
+      <div class="bg-white/90 backdrop-blur px-5 py-2 rounded-full flex items-center gap-2 text-green-900 font-semibold shadow">
+        <span class="material-symbols-outlined text-lg">psychiatry</span> 7 Crops
+      </div>
+      <div class="bg-white/90 backdrop-blur px-5 py-2 rounded-full flex items-center gap-2 text-green-900 font-semibold shadow">
+        <span class="material-symbols-outlined text-lg">translate</span> 7 Languages
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Backend URL — change this to Render URL after deployment
+  const BACKEND_URL = "https://kisanmitra-5oqv.onrender.com";
+
+  function getAdvisory() {
+    const locationVal = document.getElementById("location").value;
+    const crop = document.getElementById("crop").value;
+    const stage = document.getElementById("stage").value;
+    const language = document.getElementById("language").value;
+
+    if (!locationVal) {
+      alert("Kripya pehle apna shehar chunein!");
+      return;
+    }
+
+    const [lat, lon] = locationVal.split(",");
+    const locationName = document.getElementById("location").selectedOptions[0].text;
+
+    // Save to session and redirect to dashboard
+    sessionStorage.setItem("lat", lat);
+    sessionStorage.setItem("lon", lon);
+    sessionStorage.setItem("crop", crop);
+    sessionStorage.setItem("stage", stage);
+    sessionStorage.setItem("language", language);
+    sessionStorage.setItem("location_name", locationName);
+    sessionStorage.setItem("backend_url", BACKEND_URL);
+
+    window.location.href = "dashboard.html";
+  }
+</script>
+</body>
+</html>
