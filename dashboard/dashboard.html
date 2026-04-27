@@ -578,7 +578,7 @@ function updateSevenDayStrip(forecast, schedule) {
     const irrigation = schedule && schedule[i] ? schedule[i].decision : "IRRIGATE";
     const rain = day.rainfall_prob_pct || 0;
     const temp = day.temp_max_c || "--";
-    const icon = rain > 60 ? "🌧️" : rain > 30 ? "⛅" : day.temp_max_c > 35 ? "🔆" : "☀️";
+    const icon = getWeatherEmoji(day.temp_max_c, rain, day.wind_max_kmh || 0);
     const badge = irrigation === "SKIP" || irrigation === "REDUCE"
       ? `<span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg">${t("skip").split(" ").pop()}</span>`
       : `<span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded-lg">${t("irrigate").split(" ").pop()}</span>`;
