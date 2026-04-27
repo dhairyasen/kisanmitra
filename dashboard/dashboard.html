@@ -178,7 +178,7 @@
         <div class="text-green-300 text-sm" id="ai-advisory-sub">
           हमारा मॉडल बताता है कि अगले 48 घंटों में मिट्टी की नमी कम होगी।
         </div>
-        <div class="text-green-400 text-xs mt-2">- आपका किसानमित्र सहायक</div>
+        <div class="text-green-400 text-xs mt-2" id="ai-advisory-footer">- आपका किसानमित्र सहायक</div>
       </div>
       <button onclick="window.location.href='index.html'"
         class="bg-white text-green-900 font-bold text-sm px-4 py-2 rounded-xl hover:bg-green-50 transition-colors whitespace-nowrap" id="full-report-btn">
@@ -244,7 +244,9 @@ const UI_TEXT = {
     advice_hot: "☀️ आज बहुत गर्मी पड़ेगी — फसल को सुबह 5-7 बजे सिंचाई करें",
     advice_rain: "☁️ आज बारिश की संभावना है — सिंचाई बंद रखें और नालियां साफ करें",
     advice_wind: "💨 तेज हवा के कारण आज कीटनाशक का छिड़काव न करें",
-    advice_normal: "✅ आज मौसम ठीक है — फसल की नियमित देखभाल करें"
+    advice_normal: "✅ आज मौसम ठीक है — फसल की नियमित देखभाल करें",
+    today: "आज", irrigate_short: "सिंचाई", skip_short: "बंद",
+    ai_default: "सही समय पर सिंचाई करें और उपज बढ़ाएं।", ai_sub: "मौसम पर ध्यान रखें।", ai_footer: "- आपका किसानमित्र सहायक"
   },
   mr: {
     weather_card: "आजचे हवामान", risk_card: "पिकाला धोका", irrigation_card: "सिंचनाचा सल्ला",
@@ -264,7 +266,9 @@ const UI_TEXT = {
     advice_hot: "☀️ आज खूप उष्णता पडेल — पिकाला सकाळी 5-7 वाजता पाणी द्या",
     advice_rain: "☁️ आज पाऊस येण्याची शक्यता — सिंचन बंद ठेवा आणि नाल्या साफ करा",
     advice_wind: "💨 जोरदार वाऱ्यामुळे आज कीटकनाशक फवारू नका",
-    advice_normal: "✅ आज हवामान ठीक आहे — पिकाची नियमित काळजी घ्या"
+    advice_normal: "✅ आज हवामान ठीक आहे — पिकाची नियमित काळजी घ्या",
+    today: "आज", irrigate_short: "सिंचन", skip_short: "बंद",
+    ai_default: "योग्य वेळी सिंचन करा आणि उत्पन्न वाढवा.", ai_sub: "हवामानावर लक्ष ठेवा.", ai_footer: "- तुमचा किसानमित्र सहायक"
   },
   kn: {
     weather_card: "ಇಂದಿನ ಹವಾಮಾನ", risk_card: "ಬೆಳೆಗೆ ಅಪಾಯ", irrigation_card: "ನೀರಾವರಿ ಸಲಹೆ",
@@ -284,7 +288,9 @@ const UI_TEXT = {
     advice_hot: "☀️ ಇಂದು ತುಂಬಾ ಬಿಸಿ — ಬೆಳಿಗ್ಗೆ 5-7 ಗಂಟೆಗೆ ಬೆಳೆಗೆ ನೀರು ಕೊಡಿ",
     advice_rain: "☁️ ಇಂದು ಮಳೆ ಬರಬಹುದು — ನೀರಾವರಿ ನಿಲ್ಲಿಸಿ ಮತ್ತು ಚರಂಡಿ ಸ್ವಚ್ಛ ಮಾಡಿ",
     advice_wind: "💨 ಜೋರಾದ ಗಾಳಿಯಿಂದ ಇಂದು ಕೀಟನಾಶಕ ಸಿಂಪಡಿಸಬೇಡಿ",
-    advice_normal: "✅ ಇಂದು ಹವಾಮಾನ ಚೆನ್ನಾಗಿದೆ — ಬೆಳೆಯ ನಿಯಮಿತ ಆರೈಕೆ ಮಾಡಿ"
+    advice_normal: "✅ ಇಂದು ಹವಾಮಾನ ಚೆನ್ನಾಗಿದೆ — ಬೆಳೆಯ ನಿಯಮಿತ ಆರೈಕೆ ಮಾಡಿ",
+    today: "ಇಂದು", irrigate_short: "ನೀರಾವರಿ", skip_short: "ಬೇಡ",
+    ai_default: "ಸರಿಯಾದ ಸಮಯದಲ್ಲಿ ನೀರಾವರಿ ಮಾಡಿ.", ai_sub: "ಹವಾಮಾನ ಗಮನಿಸಿ.", ai_footer: "- ನಿಮ್ಮ ಕಿಸಾನ್‌ಮಿತ್ರ"
   },
   te: {
     weather_card: "ఈరోజు వాతావరణం", risk_card: "పంటకు ప్రమాదం", irrigation_card: "నీటిపారుదల సలహా",
@@ -304,7 +310,9 @@ const UI_TEXT = {
     advice_hot: "☀️ ఈరోజు చాలా వేడి — పంటకు ఉదయం 5-7 గంటలకు నీరు పెట్టండి",
     advice_rain: "☁️ ఈరోజు వర్షం రావచ్చు — నీటిపారుదల ఆపి కాలువలు శుభ్రం చేయండి",
     advice_wind: "💨 బలమైన గాలుల వల్ల ఈరోజు పురుగుమందు చల్లకండి",
-    advice_normal: "✅ ఈరోజు వాతావరణం బాగుంది — పంటను నిత్యం చూసుకోండి"
+    advice_normal: "✅ ఈరోజు వాతావరణం బాగుంది — పంటను నిత్యం చూసుకోండి",
+    today: "ఈరోజు", irrigate_short: "నీరు", skip_short: "వద్దు",
+    ai_default: "సరైన సమయంలో నీరు పెట్టండి.", ai_sub: "వాతావరణం చూడండి.", ai_footer: "- మీ కిసాన్‌మిత్ర"
   },
   ta: {
     weather_card: "இன்றைய வானிலை", risk_card: "பயிருக்கு ஆபத்து", irrigation_card: "நீர்ப்பாசன ஆலோசனை",
@@ -324,7 +332,9 @@ const UI_TEXT = {
     advice_hot: "☀️ இன்று மிகவும் வெப்பம் — பயிருக்கு காலை 5-7 மணிக்கு நீர் பாய்ச்சுங்கள்",
     advice_rain: "☁️ இன்று மழை வரலாம் — நீர்ப்பாசனம் நிறுத்தி வடிகால்களை சுத்தம் செய்யுங்கள்",
     advice_wind: "💨 வலுவான காற்றால் இன்று பூச்சிக்கொல்லி தெளிக்காதீர்கள்",
-    advice_normal: "✅ இன்று வானிலை நன்றாக உள்ளது — பயிரை தினமும் கவனியுங்கள்"
+    advice_normal: "✅ இன்று வானிலை நன்றாக உள்ளது — பயிரை தினமும் கவனியுங்கள்",
+    today: "இன்று", irrigate_short: "நீர்", skip_short: "வேண்டாம்",
+    ai_default: "சரியான நேரத்தில் நீர் பாய்ச்சுங்கள்.", ai_sub: "வானிலையை கவனியுங்கள்.", ai_footer: "- உங்கள் கிசான்மித்ர"
   },
   pa: {
     weather_card: "ਅੱਜ ਦਾ ਮੌਸਮ", risk_card: "ਫ਼ਸਲ ਨੂੰ ਖ਼ਤਰਾ", irrigation_card: "ਸਿੰਚਾਈ ਦੀ ਸਲਾਹ",
@@ -344,7 +354,9 @@ const UI_TEXT = {
     advice_hot: "☀️ ਅੱਜ ਬਹੁਤ ਗਰਮੀ — ਫ਼ਸਲ ਨੂੰ ਸਵੇਰੇ 5-7 ਵਜੇ ਪਾਣੀ ਦਿਓ",
     advice_rain: "☁️ ਅੱਜ ਮੀਂਹ ਪੈ ਸਕਦਾ ਹੈ — ਸਿੰਚਾਈ ਬੰਦ ਰੱਖੋ ਅਤੇ ਨਾਲੀਆਂ ਸਾਫ਼ ਕਰੋ",
     advice_wind: "💨 ਤੇਜ਼ ਹਵਾ ਕਰਕੇ ਅੱਜ ਕੀਟਨਾਸ਼ਕ ਨਾ ਛਿੜਕੋ",
-    advice_normal: "✅ ਅੱਜ ਮੌਸਮ ਠੀਕ ਹੈ — ਫ਼ਸਲ ਦੀ ਨਿਯਮਤ ਦੇਖਭਾਲ ਕਰੋ"
+    advice_normal: "✅ ਅੱਜ ਮੌਸਮ ਠੀਕ ਹੈ — ਫ਼ਸਲ ਦੀ ਨਿਯਮਤ ਦੇਖਭਾਲ ਕਰੋ",
+    today: "ਅੱਜ", irrigate_short: "ਸਿੰਚਾਈ", skip_short: "ਬੰਦ",
+    ai_default: "ਸਹੀ ਸਮੇਂ ਸਿੰਚਾਈ ਕਰੋ।", ai_sub: "ਮੌਸਮ ਵੱਲ ਧਿਆਨ ਦਿਓ।", ai_footer: "- ਤੁਹਾਡਾ ਕਿਸਾਨਮਿੱਤਰ"
   },
   bn: {
     weather_card: "আজকের আবহাওয়া", risk_card: "ফসলে বিপদ", irrigation_card: "সেচের পরামর্শ",
@@ -364,7 +376,9 @@ const UI_TEXT = {
     advice_hot: "☀️ আজ খুব গরম — ফসলে সকাল 5-7 টায় সেচ দিন",
     advice_rain: "☁️ আজ বৃষ্টি হতে পারে — সেচ বন্ধ রাখুন এবং নালা পরিষ্কার করুন",
     advice_wind: "💨 জোরালো বাতাসে আজ কীটনাশক ছিটাবেন না",
-    advice_normal: "✅ আজ আবহাওয়া ঠিক আছে — ফসলের নিয়মিত যত্ন নিন"
+    advice_normal: "✅ আজ আবহাওয়া ঠিক আছে — ফসলের নিয়মিত যত্ন নিন",
+    today: "আজ", irrigate_short: "সেচ", skip_short: "বন্ধ",
+    ai_default: "সঠিক সময়ে সেচ দিন।", ai_sub: "আবহাওয়া লক্ষ্য রাখুন।", ai_footer: "- আপনার কিসানমিত্র"
   },
   gu: {
     weather_card: "આજનું હવામાન", risk_card: "પાકને જોખમ", irrigation_card: "સિંચાઈની સલાહ",
@@ -384,7 +398,9 @@ const UI_TEXT = {
     advice_hot: "☀️ આજે ઘણી ગરમી — પાકને સવારે 5-7 વાગ્યે પાણી આપો",
     advice_rain: "☁️ આજે વરસાદ આવી શકે — સિંચાઈ બંધ રાખો અને નાળાઓ સાફ કરો",
     advice_wind: "💨 જોરદાર પવનને કારણે આજે જંતુનાશક ન છાંટો",
-    advice_normal: "✅ આજે હવામાન ઠીક છે — પાકની નિયમિત સંભાળ રાખો"
+    advice_normal: "✅ આજે હવામાન ઠીક છે — પાકની નિયમિત સંભાળ રાખો",
+    today: "આજ", irrigate_short: "સિંચાઈ", skip_short: "બંધ",
+    ai_default: "યોગ્ય સમયે સિંચાઈ કરો.", ai_sub: "હવામાન ધ્યાન રાખો.", ai_footer: "- તમારા કિસાનમિત્ર"
   },
   en: {
     weather_card: "Today's Weather", risk_card: "Crop Risk", irrigation_card: "Irrigation Advice",
@@ -404,7 +420,9 @@ const UI_TEXT = {
     advice_hot: "☀️ Very hot today — irrigate crop between 5-7 AM or 6-8 PM",
     advice_rain: "☁️ Rain expected today — stop irrigation and clear drainage channels",
     advice_wind: "💨 Strong winds — avoid pesticide spraying today",
-    advice_normal: "✅ Weather is good today — do regular crop maintenance"
+    advice_normal: "✅ Weather is good today — do regular crop maintenance",
+    today: "Today", irrigate_short: "Irrigate", skip_short: "Skip",
+    ai_default: "Irrigate at the right time and increase your yield.", ai_sub: "Monitor weather conditions.", ai_footer: "- Your KisanMitra"
   }
 };
 
@@ -436,6 +454,13 @@ function applyUILanguage() {
   if(aurBtn) aurBtn.textContent = t("aur_jaankari");
   const fullRptBtn = document.getElementById("full-report-btn");
   if(fullRptBtn) fullRptBtn.textContent = t("full_report") + " ↗";
+  // Set AI advisory default text
+  const aiText = document.getElementById("ai-advisory-text");
+  if(aiText) aiText.textContent = t("ai_default");
+  const aiSub = document.getElementById("ai-advisory-sub");
+  if(aiSub) aiSub.textContent = t("ai_sub");
+  const aiFooter = document.getElementById("ai-advisory-footer");
+  if(aiFooter) aiFooter.textContent = t("ai_footer");
 
   // Loading/error states
   const loadingText = document.querySelector("#loading-state .text-green-800");
@@ -580,13 +605,13 @@ function updateSevenDayStrip(forecast, schedule) {
     const temp = day.temp_max_c || "--";
     const icon = getWeatherEmoji(day.temp_max_c, rain, day.wind_max_kmh || 0);
     const badge = irrigation === "SKIP" || irrigation === "REDUCE"
-      ? `<span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg">${t("skip").split(" ").pop()}</span>`
-      : `<span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded-lg">${t("irrigate").split(" ").pop()}</span>`;
+      ? `<span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg">${t("skip_short")}</span>`
+      : `<span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded-lg">${t("irrigate_short")}</span>`;
 
     const date = new Date(day.date);
     const lang = sessionStorage.getItem("language") || "hi";
     const locale = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : lang === "pa" ? "pa-IN" : lang === "bn" ? "bn-IN" : lang === "ta" ? "ta-IN" : lang === "te" ? "te-IN" : lang === "kn" ? "kn-IN" : lang === "gu" ? "gu-IN" : "en-IN";
-    const dayLabel = i === 0 ? t("salah").split(" ")[0] || "Today" : date.toLocaleDateString(locale, {weekday:"short"});
+    const dayLabel = i === 0 ? t("today") : date.toLocaleDateString(locale, {weekday:"short"});
     const dateLabel = date.toLocaleDateString("en-IN", {day:"numeric", month:"short"});
 
     strip.innerHTML += `
