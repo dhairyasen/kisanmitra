@@ -161,7 +161,31 @@ def get_full_advisory(req: AdvisoryRequest):
     today = daily[0] if daily else {}
     weather_msg    = get_weather_message(lang, today.get("temp_max_c", 25), today.get("rainfall_mm", 0), today.get("wind_max_kmh", 0))
     weather_advice = get_weather_advice(lang, today.get("temp_max_c", 25), today.get("rainfall_mm", 0), today.get("wind_max_kmh", 0))
-    ai_advisory    = get_translation(lang, "ai_advisory")
+
+    # Groq AI advisory
+    import os
+    ai_advisory = get_translation(lang, "ai_advisory")  # fallback
+    try:
+        from groq import Groq
+        groq_key = os.environ.get("GROZ_API_KEY") or os.getenv("GROZ_API_KEY")
+        if groq_key:
+            _client = Groq(api_key=groq_key)
+            lang_map = {"hi":"Hindi","mr":"Marathi","kn":"Kannada","te":"Telugu",
+                        "ta":"Tamil","pa":"Punjabi","bn":"Bengali","gu":"Gujarati","en":"English"}
+            _prompt = f"""You are KisanMitra, an AI agricultural advisor for Indian farmers.
+Crop: {req.crop.value}, Stage: {req.growth_stage.value}
+Location: lat={req.lat}, lon={req.lon}
+Today: temp={today.get('temp_max_c',35)}°C, rain={today.get('rainfall_mm',0)}mm, wind={today.get('wind_max_kmh',0)}km/h
+
+Give exactly 1 short advisory sentence (max 120 chars) in {lang_map.get(lang,'Hindi')} language.
+Be specific to the crop, weather, and season. No bullets, no numbering."""
+            _resp = _client.chat.completions.create(
+                model="llama-3.3-70b-versatile", max_tokens=150,
+                messages=[{"role":"user","content":_prompt}]
+            )
+            ai_advisory = _resp.choices[0].message.content.strip()
+    except Exception as _e:
+        logger.warning(f"Groq advisory failed in /advisory/full: {_e}")
 
     return {
         "status":            "ok",

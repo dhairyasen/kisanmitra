@@ -777,12 +777,13 @@ async function loadडैशबोर्ड() {
     updateHealthCard(todayRisks);
     buildRainfallChart(forecast);
 
-    // AI advisory
-    if (data.alert_required) {
-      document.getElementById("ai-advisory-text").textContent =
-        todayRisks[0]?.advisory || t("advice_normal");
+    // AI advisory — always update from backend
+    if (data.ai_advisory) {
+      document.getElementById("ai-advisory-text").textContent = data.ai_advisory;
       document.getElementById("ai-advisory-sub").textContent =
-        `${t("risk_warn")}: ${risks[0]?.max_severity_label || "Low"}`;
+        data.alert_required
+          ? `${t("risk_warn")}: ${risks[0]?.max_severity_label || ""}`
+          : t("ai_sub");
     }
 
     const lang = sessionStorage.getItem("language") || "hi";
