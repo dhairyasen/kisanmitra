@@ -43,7 +43,7 @@ def _get_groq_advisory(farmer: dict, today_weather: dict, language: str) -> str:
     import os
     try:
         from groq import Groq
-        groq_key = os.environ.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
+        groq_key = os.environ.get("GROZ_API_KEY") or os.getenv("GROZ_API_KEY")
         if not groq_key:
             return _default_advisory(farmer, language)
 
@@ -93,7 +93,7 @@ def _get_groq_chat(farmer: dict, message: str, language: str) -> str:
     import os
     try:
         from groq import Groq
-        groq_key = os.environ.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
+        groq_key = os.environ.get("GROZ_API_KEY") or os.getenv("GROZ_API_KEY")
         if not groq_key:
             return _default_advisory(farmer, language)
 
