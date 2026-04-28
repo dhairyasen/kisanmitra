@@ -458,24 +458,56 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     y -= 6*mm
     _section(c, mg, y, cw, f"  {L['advisory']}", font)
     y -= 8*mm
-    abh = (len(adv_bullets)*9+8)*mm
+    # Word wrap long advisory lines
+    def wrap_text(text, max_chars=75):
+        words = text.split()
+        lines = []
+        current = ""
+        for word in words:
+            if len(current) + len(word) + 1 <= max_chars:
+                current = current + " " + word if current else word
+            else:
+                if current:
+                    lines.append(current)
+                current = word
+        if current:
+            lines.append(current)
+        return lines
+
+    # Expand bullets with wrapping
+    expanded_bullets = []
+    for b in adv_bullets:
+        wrapped = wrap_text(b, 72)
+        expanded_bullets.extend(wrapped[:2])  # max 2 lines per bullet
+
+    abh = (len(expanded_bullets)*7+10)*mm
     c.setFillColorRGB(*GREEN_LIGHT)
     c.roundRect(mg, y-abh, cw, abh, 5, fill=1, stroke=0)
     c.setStrokeColorRGB(*GREEN_MED); c.setLineWidth(2)
     c.line(mg, y-abh, mg, y)
     c.setFillColorRGB(*DARK); c.setFont(font,8.5)
-    for i,b in enumerate(adv_bullets):
-        c.drawString(mg+5*mm, y-(6+i*9)*mm, f"•  {b[:85]}")
+    bullet_y = y - 6*mm
+    for i,line in enumerate(expanded_bullets):
+        prefix = "•  " if i == 0 or expanded_bullets[i-1].endswith(("।", ".", "!", "?")) or not any(expanded_bullets[i-1].endswith(x) for x in ["।", ".", "!", "?"]) and i > 0 and line == wrap_text(adv_bullets[min(i, len(adv_bullets)-1)], 72)[0] else "   "
+        c.drawString(mg+5*mm, bullet_y, f"•  {line}")
+        bullet_y -= 7*mm
     y -= abh+8*mm
 
     _section(c, mg, y, cw, f"  {L['next_week']}", font)
     y -= 8*mm
-    nth = (len(next_tips)*9+8)*mm
+    expanded_tips = []
+    for t in next_tips:
+        wrapped = wrap_text(t, 72)
+        expanded_tips.extend(wrapped[:2])
+
+    nth = (len(expanded_tips)*7+10)*mm
     c.setFillColorRGB(*GREEN_LIGHT)
     c.roundRect(mg, y-nth, cw, nth, 5, fill=1, stroke=0)
     c.setFillColorRGB(*DARK); c.setFont(font,8.5)
-    for i,t in enumerate(next_tips):
-        c.drawString(mg+5*mm, y-(6+i*9)*mm, f"->  {t[:85]}")
+    tip_y = y - 6*mm
+    for line in expanded_tips:
+        c.drawString(mg+5*mm, tip_y, f"->  {line}")
+        tip_y -= 7*mm
     y -= nth+10*mm
 
     # Emergency
