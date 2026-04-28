@@ -25,15 +25,9 @@ from config.settings import get_settings
 
 logger = get_logger("scheduler")
 settings = get_settings()
-
-# In-memory farmer registry (replace with DB in production)
-FARMER_REGISTRY = []
+from api.farmer_router import get_all_farmers
 
 
-def register_farmer(farmer: dict):
-    """Add a farmer to the registry for automated alerts."""
-    FARMER_REGISTRY.append(farmer)
-    logger.info(f"Farmer registered for alerts: {farmer.get('name')} | {farmer.get('crop')}")
 
 
 def run_morning_briefing():
@@ -43,7 +37,7 @@ def run_morning_briefing():
     """
     logger.info(f"Running morning briefing at {datetime.now().strftime('%H:%M')}")
 
-    for farmer in FARMER_REGISTRY:
+    for farmer in get_all_farmers():
         try:
             lat = farmer.get("lat")
             lon = farmer.get("lon")
@@ -82,7 +76,7 @@ def run_risk_check():
     """
     logger.info(f"Running risk check at {datetime.now().strftime('%H:%M')}")
 
-    for farmer in FARMER_REGISTRY:
+    for farmer in get_all_farmers():
         try:
             lat = farmer.get("lat")
             lon = farmer.get("lon")

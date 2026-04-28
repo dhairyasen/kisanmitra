@@ -101,11 +101,12 @@ def get_irrigation_schedule(
         elif net_irrigation_mm < 1.5:
             decision = "REDUCE"
             reason = f"Partial rainfall ({rainfall}mm). Light irrigation needed."
-            volume_liters = round(net_irrigation_mm * 0.5 * area_ha * 10000, 0)
+            # Apply drip irrigation wetted area fraction (0.1) and efficiency factor (0.7)
+            volume_liters = round((net_irrigation_mm * soil_factor * area_ha * 10000 * 0.1) / 0.7, 0)
         else:
             decision = "IRRIGATE"
-            reason = f"ET₀={et0}mm, Crop need={etc:.1f}mm, Rainfall={rainfall}mm. Full irrigation required."
-            volume_liters = round(net_irrigation_mm * soil_factor * area_ha * 10000, 0)
+            reason = f"Water needed: {etc:.1f}mm | Expected Rain: {rainfall}mm. Full irrigation required."
+            volume_liters = round((net_irrigation_mm * soil_factor * area_ha * 10000 * 0.1) / 0.7, 0)
 
         schedule.append({
             "date": day.get("date"),
