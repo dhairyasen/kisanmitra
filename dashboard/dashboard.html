@@ -180,7 +180,7 @@
         </div>
         <div class="text-green-400 text-xs mt-2" id="ai-advisory-footer">- आपका किसानमित्र सहायक</div>
       </div>
-      <button onclick="window.location.href='index.html'"
+      <button onclick="downloadReport()"
         class="bg-white text-green-900 font-bold text-sm px-4 py-2 rounded-xl hover:bg-green-50 transition-colors whitespace-nowrap" id="full-report-btn">
         पूरी रिपोर्ट देखें ↗
       </button>
@@ -431,6 +431,38 @@ const UI_TEXT = {
 function t(key) {
   const lang = sessionStorage.getItem("language") || "hi";
   return (UI_TEXT[lang] || UI_TEXT["hi"])[key] || UI_TEXT["hi"][key] || key;
+}
+
+async function downloadReport() {
+  const btn = document.getElementById("full-report-btn");
+  btn.textContent = "Generating...";
+  btn.disabled = true;
+  try {
+    const response = await fetch(`${BACKEND_URL}/advisory/report`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        lat: lat, lon: lon,
+        crop: crop, growth_stage: stage,
+        field_area_acres: fieldArea,
+        soil_type: soilType,
+        language: language
+      })
+    });
+    if (!response.ok) throw new Error("Report failed");
+    const blob = await response.blob();
+    const url  = window.URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = "KisanMitra_Report.pdf";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  } catch(e) {
+    alert("Report generation failed. Please try again.");
+  } finally {
+    btn.textContent = "View Full Report ↗";
+    btn.disabled = false;
+  }
 }
 
 function applyUILanguage() {

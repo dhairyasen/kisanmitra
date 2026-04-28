@@ -233,5 +233,99 @@ def chatbot_query(req: ChatbotRequest):
         "language": req.language.value
     }
 
+@app.post("/advisory/report", tags=["Advisory"])
+def get_advisory_report(req: AdvisoryRequest):
+    """
+    Generate PDF report for anonymous (non-registered) user from dashboard.
+    Uses same data as /advisory/full but returns a PDF file.
+    """
+    from fastapi.responses import Response
+    from models.risk_classifier import classify_risk_translated
+    from ingestion.nasa_power import get_7day_sequence
+    from models.rainfall_lstm import predict_rainfall
+    from utils.pdf_generator import generate_pdf
+    import os
+
+    weather = fetch_open_meteo(req.lat, req.lon, days=7)
+    if not weather:
+        raise HTTPException(status_code=503, detail="Weather data unavailable")
+
+    lang  = req.language.value if req.language else "hi"
+    daily = weather.get("daily_forecast", [])
+
+    # LSTM prediction
+    try:
+        past_7    = get_7day_sequence(req.lat, req.lon)
+        lstm_pred = predict_rainfall(past_7)
+    except Exception:
+        lstm_pred = {"rainfall_mm_24h":0,"rainfall_mm_48h":0,"rainfall_mm_72h":0,
+                     "probability_24h":0,"probability_48h":0,"probability_72h":0,"source":"fallback"}
+
+    # Risk
+    risks = []
+    for day in daily:
+        result = classify_risk_translated(
+            crop=req.crop.value, growth_stage=req.growth_stage.value,
+            temp_min_c=day.get("temp_min_c"), temp_max_c=day.get("temp_max_c"),
+            rainfall_mm=day.get("rainfall_mm",0), wind_kmh=day.get("wind_max_kmh",0),
+            rainfall_prob_pct=day.get("rainfall_prob_pct",0), language=lang
+        )
+        result["date"] = day.get("date")
+        risks.append(result)
+
+    # Irrigation
+    irrigation = get_irrigation_schedule(
+        crop=req.crop.value, growth_stage=req.growth_stage.value,
+        field_area_acres=req.field_area_acres,
+        daily_forecast=daily, soil_type=req.soil_type.value
+    )
+
+    # Groq advisory
+    try:
+        from groq import Groq
+        groq_key = os.environ.get("GROZ_API_KEY") or os.getenv("GROZ_API_KEY")
+        if groq_key:
+            client = Groq(api_key=groq_key)
+            lang_map = {"hi":"Hindi","mr":"Marathi","kn":"Kannada","te":"Telugu",
+                        "ta":"Tamil","pa":"Punjabi","bn":"Bengali","gu":"Gujarati","en":"English"}
+            today_w = daily[0] if daily else {}
+            prompt = f"""You are KisanMitra, an expert agricultural advisor.
+Crop: {req.crop.value}, Stage: {req.growth_stage.value}, Temp: {today_w.get('temp_max_c',35)}°C, Rain: {today_w.get('rainfall_mm',0)}mm.
+Give 6 advisory points in {lang_map.get(lang,'Hindi')}. 4 for this week, 2 for next week. One per line, no bullets."""
+            resp = client.chat.completions.create(
+                model="llama-3.3-70b-versatile", max_tokens=400,
+                messages=[{"role":"user","content":prompt}]
+            )
+            advisory = resp.choices[0].message.content.strip()
+        else:
+            advisory = f"Irrigate {req.crop.value} in early morning. Monitor temperature. Check leaves regularly."
+    except Exception:
+        advisory = f"Irrigate {req.crop.value} in early morning. Monitor temperature. Check leaves regularly."
+
+    # Dummy farmer dict for PDF
+    farmer_dict = {
+        "farmer_id": "guest", "name": "KisanMitra User",
+        "district": "India", "state": "",
+        "crop": req.crop.value, "growth_stage": req.growth_stage.value,
+        "field_area_acres": req.field_area_acres,
+        "soil_type": req.soil_type.value, "language": lang
+    }
+
+    try:
+        pdf_bytes = generate_pdf(
+            farmer=farmer_dict, weather=weather, risks=risks,
+            irrigation=irrigation, lstm_pred=lstm_pred,
+            advisory=advisory, language=lang
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"PDF generation failed: {str(e)}")
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=KisanMitra_Report.pdf"}
+    )
+
+
 if __name__ == "__main__":
     uvicorn.run("api.main:app", host=settings.app_host, port=settings.app_port, reload=settings.debug)
