@@ -73,7 +73,7 @@ def et0_to_liters(et0_mm: float, field_area_acres: float, efficiency: float = 0.
     # mm × m² / 1000 = m³, × 1000 = liters → mm × m² = liters
     # But 1mm on 4047m² = 4047 liters which is correct
     # Issue was ×10000 before — wrong unit conversion
-    gross_liters = (et0_mm / efficiency) * area_m2
+    gross_liters = (et0_mm / efficiency) * area_m2 / 10
 
     # Cap at realistic daily max (150mm equivalent per day = extreme flood irrigation)
     max_liters = 150 * area_m2
