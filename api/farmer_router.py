@@ -36,6 +36,105 @@ logger = get_logger("farmer_router")
 router = APIRouter(prefix="/farmers", tags=["Farmers"])
 
 
+# ── Groq Advisory Helpers ─────────────────────────────────────
+
+def _get_groq_advisory(farmer: dict, today_weather: dict, language: str) -> str:
+    """Get crop advisory from Groq — simple direct call."""
+    import os
+    try:
+        from groq import Groq
+        groq_key = os.getenv("GROQ_API_KEY")
+        if not groq_key:
+            return _default_advisory(farmer, language)
+
+        client = Groq(api_key=groq_key)
+
+        lang_map = {
+            "hi": "Hindi", "mr": "Marathi", "kn": "Kannada",
+            "te": "Telugu", "ta": "Tamil", "pa": "Punjabi",
+            "bn": "Bengali", "gu": "Gujarati", "en": "English"
+        }
+        lang_name = lang_map.get(language, "Hindi")
+
+        prompt = f"""You are KisanMitra, an expert agricultural advisor for Indian farmers.
+
+Farmer profile:
+- Crop: {farmer.get('crop', 'wheat')}
+- Growth Stage: {farmer.get('growth_stage', 'vegetative')}
+- Location: {farmer.get('district', 'India')}, {farmer.get('state', 'India')}
+- Field: {farmer.get('field_area_acres', 1)} acres, {farmer.get('soil_type', 'loamy')} soil
+
+Today's weather:
+- Max Temp: {today_weather.get('temp_max_c', 35)}°C
+- Rainfall: {today_weather.get('rainfall_mm', 0)}mm
+- Wind: {today_weather.get('wind_max_kmh', 15)} km/h
+
+Give 4 specific, practical weekly advisory points for this farmer.
+Respond ONLY in {lang_name} language.
+Keep each point short (1 sentence).
+Format: one point per line, no bullets or numbers."""
+
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            max_tokens=400,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        return response.choices[0].message.content.strip()
+
+    except Exception as e:
+        logger.warning(f"Groq advisory failed: {e}")
+        return _default_advisory(farmer, language)
+
+
+def _get_groq_chat(farmer: dict, message: str, language: str) -> str:
+    """Get chatbot response from Groq."""
+    import os
+    try:
+        from groq import Groq
+        groq_key = os.getenv("GROQ_API_KEY")
+        if not groq_key:
+            return _default_advisory(farmer, language)
+
+        client = Groq(api_key=groq_key)
+
+        lang_map = {
+            "hi": "Hindi", "mr": "Marathi", "kn": "Kannada",
+            "te": "Telugu", "ta": "Tamil", "pa": "Punjabi",
+            "bn": "Bengali", "gu": "Gujarati", "en": "English"
+        }
+        lang_name = lang_map.get(language, "Hindi")
+
+        system = f"""You are KisanMitra, a friendly agricultural advisor for Indian farmers.
+Farmer grows {farmer.get('crop')} in {farmer.get('district')}, {farmer.get('state')}.
+Growth stage: {farmer.get('growth_stage')}.
+Always respond in {lang_name} language. Keep answers short and practical."""
+
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            max_tokens=300,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": message}
+            ]
+        )
+        return response.choices[0].message.content.strip()
+
+    except Exception as e:
+        logger.warning(f"Groq chat failed: {e}")
+        return _default_advisory(farmer, language)
+
+
+def _default_advisory(farmer: dict, language: str) -> str:
+    """Fallback advisory when Groq unavailable."""
+    crop = farmer.get('crop', 'fasal')
+    defaults = {
+        "hi": f"{crop} की फसल को सुबह सिंचाई करें। तापमान पर नजर रखें। पत्तियां नियमित जांचें। स्थानीय कृषि केंद्र से सलाह लें।",
+        "mr": f"{crop} पिकाला सकाळी पाणी द्या। तापमानावर लक्ष ठेवा। पाने नियमित तपासा। स्थानिक कृषी केंद्राशी संपर्क करा।",
+        "en": f"Irrigate {crop} in early morning. Monitor temperature. Check leaves regularly. Consult local Krishi Kendra.",
+    }
+    return defaults.get(language, defaults["en"])
+
+
 # ── Pydantic Request Models ───────────────────────────────────
 
 class FarmerRegisterRequest(BaseModel):
@@ -232,26 +331,8 @@ def get_farmer_advisory(farmer_id: str, db: Session = Depends(get_db)):
         soil_type=farmer.soil_type
     )
 
-    # Step 5: LLM advisory
-    try:
-        from agents.crop_advisor_agent import quick_advisory
-        from config.settings import get_settings
-        cfg = get_settings()
-
-        if cfg.anthropic_api_key:
-            ai_advisory = quick_advisory(
-                question=f"Give weather and crop advisory for {farmer.crop} at {farmer.growth_stage} stage in {farmer.district}",
-                lat=farmer.lat,
-                lon=farmer.lon,
-                crop=farmer.crop,
-                growth_stage=farmer.growth_stage,
-                language=lang
-            )
-        else:
-            ai_advisory = f"Apni {farmer.crop} fasal ka dhyan rakhein. Mausam par nazar rakhein."
-    except Exception as e:
-        logger.warning(f"LLM advisory failed: {e}")
-        ai_advisory = f"Apni {farmer.crop} fasal ka dhyan rakhein."
+    # Step 5: LLM advisory via Groq
+    ai_advisory = _get_groq_advisory(farmer, today, lang)
 
     # Step 6: Route alerts if severity >= 2
     alert_result = {"status": "no_alert"}
@@ -294,37 +375,14 @@ def farmer_chatbot(farmer_id: str, req: ChatbotRequest, db: Session = Depends(ge
 
     lang = req.language.value if req.language else farmer.language
 
-    try:
-        from agents.crop_advisor_agent import quick_advisory
-        from config.settings import get_settings
-        cfg = get_settings()
-
-        if not cfg.anthropic_api_key:
-            return {
-                "status":   "no_api_key",
-                "response": "AI advisory requires ANTHROPIC_API_KEY in .env file.",
-            }
-
-        response = quick_advisory(
-            question=req.message,
-            lat=farmer.lat,
-            lon=farmer.lon,
-            crop=farmer.crop,
-            growth_stage=farmer.growth_stage,
-            language=lang
-        )
-
-        return {
-            "status":     "ok",
-            "farmer_id":  farmer_id,
-            "query":      req.message,
-            "response":   response,
-            "language":   lang,
-        }
-
-    except Exception as e:
-        logger.error(f"Chatbot error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    response = _get_groq_chat(farmer.to_dict(), req.message, lang)
+    return {
+        "status":     "ok",
+        "farmer_id":  farmer_id,
+        "query":      req.message,
+        "response":   response,
+        "language":   lang,
+    }
 
 
 # ── PDF Report Endpoint ───────────────────────────────────────
@@ -380,21 +438,9 @@ def get_farmer_report(farmer_id: str, db: Session = Depends(get_db)):
         daily_forecast=daily, soil_type=farmer.soil_type
     )
 
-    # AI Advisory
-    try:
-        from agents.crop_advisor_agent import quick_advisory
-        from config.settings import get_settings
-        cfg = get_settings()
-        if cfg.anthropic_api_key:
-            advisory = quick_advisory(
-                question=f"Give weekly advisory for {farmer.crop} at {farmer.growth_stage} stage in {farmer.district}",
-                lat=farmer.lat, lon=farmer.lon,
-                crop=farmer.crop, growth_stage=farmer.growth_stage, language=lang
-            )
-        else:
-            advisory = f"Monitor your {farmer.crop} crop regularly. Check weather updates daily."
-    except Exception:
-        advisory = f"Monitor your {farmer.crop} crop regularly."
+    # AI Advisory via Groq
+    today_w = daily[0] if daily else {}
+    advisory = _get_groq_advisory(farmer.to_dict(), today_w, lang)
 
     # Generate PDF
     try:
