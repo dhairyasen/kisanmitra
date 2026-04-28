@@ -7,7 +7,7 @@ Gives crop-aware, multilingual, conversational advisory to farmers.
 import sys
 sys.path.insert(0, '.')
 
-from langchain_anthropic import ChatAnthropic
+from langchain_groq import ChatGroq
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.memory import ConversationBufferWindowMemory
@@ -83,12 +83,14 @@ def create_kisan_agent(
     Create a personalized KisanMitra agent for a specific farmer.
     Returns AgentExecutor ready to chat.
     """
-    if not settings.anthropic_api_key:
-        raise ValueError("ANTHROPIC_API_KEY not set in .env file")
+    import os
+    groq_key = os.getenv("GROQ_API_KEY") or getattr(settings, "groq_api_key", None)
+    if not groq_key:
+        raise ValueError("GROQ_API_KEY not set")
 
-    llm = ChatAnthropic(
-        model="claude-3-5-sonnet-20241022",
-        anthropic_api_key=settings.anthropic_api_key,
+    llm = ChatGroq(
+        model="llama-3.3-70b-versatile",
+        groq_api_key=groq_key,
         temperature=0.3,
         max_tokens=1024
     )

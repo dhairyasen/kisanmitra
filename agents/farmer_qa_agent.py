@@ -111,14 +111,16 @@ def ask_farmer_agent(
         Agent's response as string
     """
     try:
-        import anthropic
+        import os
+        from groq import Groq
         from config.settings import get_settings
 
         cfg = get_settings()
-        if not cfg.anthropic_api_key:
+        groq_key = os.getenv("GROQ_API_KEY") or getattr(cfg, "groq_api_key", None)
+        if not groq_key:
             return _fallback_response(message, farmer, language)
 
-        client = anthropic.Anthropic(api_key=cfg.anthropic_api_key)
+        client = Groq(api_key=groq_key)
 
         # Build system prompt
         system_prompt = build_system_prompt(farmer, language, weather_context)
@@ -130,17 +132,16 @@ def ask_farmer_agent(
         add_to_history(farmer_id, "user", message)
 
         # Build messages for API
-        messages = history + [{"role": "user", "content": message}]
+        messages = [{"role": "system", "content": system_prompt}] + history + [{"role": "user", "content": message}]
 
-        # Call Claude API
-        response = client.messages.create(
-            model="claude-haiku-4-5-20251001",  # Fast + cheap for chatbot
+        # Call Groq API
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
             max_tokens=300,
-            system=system_prompt,
             messages=messages
         )
 
-        answer = response.content[0].text.strip()
+        answer = response.choices[0].message.content.strip()
 
         # Save response to history
         add_to_history(farmer_id, "assistant", answer)
