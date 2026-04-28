@@ -84,9 +84,9 @@ def create_kisan_agent(
     Returns AgentExecutor ready to chat.
     """
     import os
-    groq_key = os.getenv("GROQ_API_KEY") or getattr(settings, "groq_api_key", None)
+    groq_key = os.getenv("GROZ_API_KEY") or os.environ.get("GROZ_API_KEY")
     if not groq_key:
-        raise ValueError("GROQ_API_KEY not set")
+        raise ValueError("GROZ_API_KEY not set")
 
     llm = ChatGroq(
         model="llama-3.3-70b-versatile",

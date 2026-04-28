@@ -116,7 +116,7 @@ def ask_farmer_agent(
         from config.settings import get_settings
 
         cfg = get_settings()
-        groq_key = os.getenv("GROQ_API_KEY") or getattr(cfg, "groq_api_key", None)
+        groq_key = os.getenv("GROZ_API_KEY") or os.environ.get("GROZ_API_KEY")
         if not groq_key:
             return _fallback_response(message, farmer, language)
 

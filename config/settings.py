@@ -4,6 +4,7 @@ from functools import lru_cache
 class Settings(BaseSettings):
     # LLM
     anthropic_api_key: str = ""
+    groz_api_key: str = ""
 
     # Weather APIs
     open_meteo_base_url: str = "https://api.open-meteo.com/v1/forecast"

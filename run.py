@@ -2,21 +2,25 @@
 Entry point to run KisanMitra API server.
 Run: python run.py
 """
+import os
 import uvicorn
 from config.settings import get_settings
 
 settings = get_settings()
 
 if __name__ == "__main__":
-    print("🌾 Starting KisanMitra — Smart Weather Intelligence for Farmers")
-    print(f"   Server: http://{settings.app_host}:{settings.app_port}")
-    print(f"   Docs:   http://localhost:{settings.app_port}/docs")
+    port = int(os.environ.get("PORT", settings.app_port))
+    host = "0.0.0.0"
+
+    print("Starting KisanMitra - Smart Weather Intelligence for Farmers")
+    print(f"   Server: http://{host}:{port}")
+    print(f"   Docs:   http://localhost:{port}/docs")
     print("   Press Ctrl+C to stop\n")
 
     uvicorn.run(
         "api.main:app",
-        host=settings.app_host,
-        port=settings.app_port,
-        reload=settings.debug,
+        host=host,
+        port=port,
+        reload=False,
         log_level="info"
     )

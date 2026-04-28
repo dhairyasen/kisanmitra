@@ -39,7 +39,9 @@ class SoilTypeEnum(str, Enum):
     sandy = "sandy"
     loamy = "loamy"
     clay = "clay"
-    black_cotton = "black-cotton"
+    silt = "silt"
+    black = "black"
+    red = "red"
 
 class LanguageEnum(str, Enum):
     hi = "hi"   # Hindi
