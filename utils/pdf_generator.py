@@ -458,27 +458,35 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     y -= 6*mm
     _section(c, mg, y, cw, f"  {L['advisory']}", font)
     y -= 8*mm
-    # Word wrap long advisory lines
-    def wrap_text(text, max_chars=75):
+    # Word wrap long advisory lines (Unicode-safe)
+    def wrap_text(text, max_chars=40):
+        """Unicode-safe wrap: use character count not byte count"""
         words = text.split()
         lines = []
         current = ""
         for word in words:
-            if len(current) + len(word) + 1 <= max_chars:
-                current = current + " " + word if current else word
+            # Use len() on string directly - Python 3 counts chars not bytes
+            test = current + " " + word if current else word
+            if len(test) <= max_chars:
+                current = test
             else:
                 if current:
                     lines.append(current)
-                current = word
+                # If single word is too long, split it
+                if len(word) > max_chars:
+                    lines.append(word[:max_chars])
+                    current = word[max_chars:]
+                else:
+                    current = word
         if current:
             lines.append(current)
-        return lines
+        return lines if lines else [text[:max_chars]]
 
     # Expand bullets with wrapping
     expanded_bullets = []
     for b in adv_bullets:
         wrapped = wrap_text(b, 72)
-        expanded_bullets.extend(wrapped[:2])  # max 2 lines per bullet
+        expanded_bullets.extend(wrapped[:3])  # max 3 lines per bullet
 
     abh = (len(expanded_bullets)*7+10)*mm
     c.setFillColorRGB(*GREEN_LIGHT)
@@ -488,7 +496,6 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     c.setFillColorRGB(*DARK); c.setFont(font,8.5)
     bullet_y = y - 6*mm
     for i,line in enumerate(expanded_bullets):
-        prefix = "•  " if i == 0 or expanded_bullets[i-1].endswith(("।", ".", "!", "?")) or not any(expanded_bullets[i-1].endswith(x) for x in ["।", ".", "!", "?"]) and i > 0 and line == wrap_text(adv_bullets[min(i, len(adv_bullets)-1)], 72)[0] else "   "
         c.drawString(mg+5*mm, bullet_y, f"•  {line}")
         bullet_y -= 7*mm
     y -= abh+8*mm
@@ -498,7 +505,7 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     expanded_tips = []
     for t in next_tips:
         wrapped = wrap_text(t, 72)
-        expanded_tips.extend(wrapped[:2])
+        expanded_tips.extend(wrapped[:3])
 
     nth = (len(expanded_tips)*7+10)*mm
     c.setFillColorRGB(*GREEN_LIGHT)

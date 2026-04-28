@@ -572,7 +572,7 @@ function updateRiskCard(risks) {
     card.className = "card border-l-4 border-green-500";
     badge.textContent = t("risk_safe");
     badge.className = "inline-block px-3 py-1 rounded-full text-white text-sm font-bold mb-2 bg-green-500";
-    msg.textContent = t("no_risk") || t("risk_safe");
+    msg.textContent = t("advice_normal") || t("risk_safe");
     updateKhatraMeter(0);
     return;
   }
