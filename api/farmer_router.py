@@ -43,8 +43,7 @@ def _get_groq_advisory(farmer: dict, today_weather: dict, language: str) -> str:
     import os
     try:
         from groq import Groq
-        groq_key = os.environ.get("GROZ_API_KEY") or os.getenv("GROZ_API_KEY")
-        logger.info(f"Groq key present: {bool(groq_key)}, length: {len(groq_key) if groq_key else 0}")
+        groq_key = os.environ.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
         if not groq_key:
             return _default_advisory(farmer, language)
 
@@ -70,10 +69,12 @@ Today's weather:
 - Rainfall: {today_weather.get('rainfall_mm', 0)}mm
 - Wind: {today_weather.get('wind_max_kmh', 15)} km/h
 
-Give 4 specific, practical weekly advisory points for this farmer.
+Give exactly 6 points for this farmer — 4 for this week, 2 for next week.
 Respond ONLY in {lang_name} language.
-Keep each point short (1 sentence).
-Format: one point per line, no bullets or numbers."""
+Keep each point short (1 sentence, max 80 characters).
+Format: one point per line, no bullets or numbers.
+Line 1-4: This week advisory
+Line 5-6: Next week tips"""
 
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -92,7 +93,7 @@ def _get_groq_chat(farmer: dict, message: str, language: str) -> str:
     import os
     try:
         from groq import Groq
-        groq_key = os.environ.get("GROZ_API_KEY") or os.getenv("GROZ_API_KEY")
+        groq_key = os.environ.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
         if not groq_key:
             return _default_advisory(farmer, language)
 
