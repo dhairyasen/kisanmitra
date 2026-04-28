@@ -439,31 +439,43 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     c.setFillColorRGB(*GRAY); c.setFont(font,7)
     c.drawRightString(W-mg, 8*mm, f"{L['page']} 3 {L['of']} 3")
 
-    adv_lines  = [l.strip() for l in advisory.split("\n") if l.strip() and len(l.strip())>5]
-    adv_bullets= adv_lines[:4] or ["Monitor your crop daily"]
-    next_tips  = adv_lines[4:6] if len(adv_lines)>4 else ["Check weather daily","Consult Krishi Kendra if needed"]
+    # Split advisory into lines, handle both newline and sentence endings
+    adv_raw = []
+    for line in advisory.split("\n"):
+        line = line.strip()
+        if line and len(line) > 5:
+            adv_raw.append(line)
+    
+    # If less than 4 lines, split long lines into sentences
+    if len(adv_raw) < 4:
+        import re
+        sentences = re.split(r'[।\.!]', advisory)
+        adv_raw = [s.strip() for s in sentences if s.strip() and len(s.strip()) > 10]
+    
+    adv_bullets = adv_raw[:4] or ["Monitor your crop daily", "Check weather updates", "Irrigate in morning", "Consult local Krishi Kendra"]
+    next_tips   = adv_raw[4:6] if len(adv_raw) > 4 else ["Check weather forecast daily", "Consult local Krishi Kendra if needed"]
 
     y -= 6*mm
     _section(c, mg, y, cw, f"  {L['advisory']}", font)
     y -= 8*mm
-    abh = (len(adv_bullets)*7+8)*mm
+    abh = (len(adv_bullets)*9+8)*mm
     c.setFillColorRGB(*GREEN_LIGHT)
     c.roundRect(mg, y-abh, cw, abh, 5, fill=1, stroke=0)
     c.setStrokeColorRGB(*GREEN_MED); c.setLineWidth(2)
     c.line(mg, y-abh, mg, y)
     c.setFillColorRGB(*DARK); c.setFont(font,8.5)
     for i,b in enumerate(adv_bullets):
-        c.drawString(mg+5*mm, y-(6+i*7)*mm, f"•  {b[:68]}")
+        c.drawString(mg+5*mm, y-(6+i*9)*mm, f"•  {b[:85]}")
     y -= abh+8*mm
 
     _section(c, mg, y, cw, f"  {L['next_week']}", font)
     y -= 8*mm
-    nth = (len(next_tips)*7+8)*mm
+    nth = (len(next_tips)*9+8)*mm
     c.setFillColorRGB(*GREEN_LIGHT)
     c.roundRect(mg, y-nth, cw, nth, 5, fill=1, stroke=0)
     c.setFillColorRGB(*DARK); c.setFont(font,8.5)
     for i,t in enumerate(next_tips):
-        c.drawString(mg+5*mm, y-(6+i*7)*mm, f"->  {t[:68]}")
+        c.drawString(mg+5*mm, y-(6+i*9)*mm, f"->  {t[:85]}")
     y -= nth+10*mm
 
     # Emergency
