@@ -327,6 +327,96 @@ def farmer_chatbot(farmer_id: str, req: ChatbotRequest, db: Session = Depends(ge
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ── PDF Report Endpoint ───────────────────────────────────────
+
+@router.get("/{farmer_id}/report")
+def get_farmer_report(farmer_id: str, db: Session = Depends(get_db)):
+    """
+    Generate and download weekly PDF climate risk report for a farmer.
+    PDF generated in memory — no disk storage used.
+    """
+    from fastapi.responses import Response
+    from ingestion.weather_fetcher import fetch_open_meteo
+    from ingestion.nasa_power import get_7day_sequence
+    from models.rainfall_lstm import predict_rainfall
+    from models.risk_classifier import classify_risk_translated
+    from models.irrigation_model import get_irrigation_schedule
+    from utils.pdf_generator import generate_pdf
+
+    farmer = get_farmer_or_404(farmer_id, db)
+    lang   = farmer.language
+
+    # Fetch weather
+    weather = fetch_open_meteo(farmer.lat, farmer.lon, days=7)
+    if not weather:
+        raise HTTPException(status_code=503, detail="Weather data unavailable")
+
+    daily = weather.get("daily_forecast", [])
+
+    # LSTM prediction
+    try:
+        past_7 = get_7day_sequence(farmer.lat, farmer.lon)
+        lstm_pred = predict_rainfall(past_7)
+    except Exception:
+        lstm_pred = {"rainfall_mm_24h":0,"rainfall_mm_48h":0,"rainfall_mm_72h":0,
+                     "probability_24h":0,"probability_48h":0,"probability_72h":0,"source":"fallback"}
+
+    # Risk classification
+    risks = []
+    for day in daily:
+        result = classify_risk_translated(
+            crop=farmer.crop, growth_stage=farmer.growth_stage,
+            temp_min_c=day.get("temp_min_c"), temp_max_c=day.get("temp_max_c"),
+            rainfall_mm=day.get("rainfall_mm",0), wind_kmh=day.get("wind_max_kmh",0),
+            rainfall_prob_pct=day.get("rainfall_prob_pct",0), language=lang
+        )
+        result["date"] = day.get("date")
+        risks.append(result)
+
+    # Irrigation schedule
+    irrigation = get_irrigation_schedule(
+        crop=farmer.crop, growth_stage=farmer.growth_stage,
+        field_area_acres=farmer.field_area_acres,
+        daily_forecast=daily, soil_type=farmer.soil_type
+    )
+
+    # AI Advisory
+    try:
+        from agents.crop_advisor_agent import quick_advisory
+        from config.settings import get_settings
+        cfg = get_settings()
+        if cfg.anthropic_api_key:
+            advisory = quick_advisory(
+                question=f"Give weekly advisory for {farmer.crop} at {farmer.growth_stage} stage in {farmer.district}",
+                lat=farmer.lat, lon=farmer.lon,
+                crop=farmer.crop, growth_stage=farmer.growth_stage, language=lang
+            )
+        else:
+            advisory = f"Monitor your {farmer.crop} crop regularly. Check weather updates daily."
+    except Exception:
+        advisory = f"Monitor your {farmer.crop} crop regularly."
+
+    # Generate PDF
+    try:
+        pdf_bytes = generate_pdf(
+            farmer=farmer.to_dict(), weather=weather, risks=risks,
+            irrigation=irrigation, lstm_pred=lstm_pred,
+            advisory=advisory, language=lang
+        )
+    except Exception as e:
+        logger.error(f"PDF generation error: {e}")
+        raise HTTPException(status_code=500, detail=f"PDF generation failed: {str(e)}")
+
+    filename = f"KisanMitra_Report_{farmer.name.replace(' ','_')}_{farmer_id}.pdf"
+    logger.info(f"PDF report generated for farmer {farmer_id}")
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+
 # ── Helper for scheduler ──────────────────────────────────────
 
 def get_all_farmers(db: Session = None):

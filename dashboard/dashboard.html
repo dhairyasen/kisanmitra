@@ -219,6 +219,8 @@ const crop = sessionStorage.getItem("crop") || "wheat";
 const stage = sessionStorage.getItem("stage") || "vegetative";
 const language = sessionStorage.getItem("language") || "hi";
 const locationName = sessionStorage.getItem("location_name") || "Indore";
+const fieldArea = parseFloat(sessionStorage.getItem("field_area") || "1.0");
+const soilType  = sessionStorage.getItem("soil_type") || "loamy";
 
 const CROP_NAMES = {
   wheat:"Wheat-गेहूं", rice:"Rice-चावल", soybean:"Soybean-सोयाबीन",
@@ -709,7 +711,7 @@ async function loadडैशबोर्ड() {
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({
         lat, lon, crop, growth_stage: stage,
-        field_area_acres: 1.0, soil_type: "loamy", language
+        field_area_acres: fieldArea, soil_type: soilType, language
       })
     });
 

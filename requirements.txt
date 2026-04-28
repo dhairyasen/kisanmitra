@@ -44,3 +44,5 @@ pytest>=8.2.0
 pytest-asyncio>=0.23.0
 torch>=2.11.0
 torchvision>=0.26.0
+
+reportlab>=4.0.0

@@ -122,6 +122,27 @@
           </select>
         </div>
 
+        <!-- Field Size -->
+        <div>
+          <label id="field-label" class="block text-sm font-semibold text-gray-600 mb-1">Khet Ka Aakaar / Field Size (Acres)</label>
+          <input type="number" id="field_area" value="1.0" min="0.1" max="1000" step="0.1"
+            class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-green-300 outline-none"
+            placeholder="e.g. 2.5" />
+        </div>
+
+        <!-- Soil Type -->
+        <div>
+          <label id="soil-label" class="block text-sm font-semibold text-gray-600 mb-1">Mitti Ka Prakar / Soil Type</label>
+          <select id="soil_type" class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-green-300 outline-none">
+            <option value="loamy" id="soil-loamy">Loamy - दोमट</option>
+            <option value="clay" id="soil-clay">Clay - चिकनी</option>
+            <option value="sandy" id="soil-sandy">Sandy - रेतीली</option>
+            <option value="silt" id="soil-silt">Silt - गाद</option>
+            <option value="black" id="soil-black">Black - काली</option>
+            <option value="red" id="soil-red">Red - लाल</option>
+          </select>
+        </div>
+
         <!-- Language -->
         <div>
           <label class="block text-sm font-semibold text-gray-600 mb-1">Bhasha Chunein / Select Language</label>
@@ -165,6 +186,34 @@
   // Backend URL — change this to Render URL after deployment
   const BACKEND_URL = "https://kisanmitra-5oqv.onrender.com";
 
+  const LANG_LABELS = {
+    hi: { field: "खेत का आकार (एकड़)", soil: "मिट्टी का प्रकार", loamy:"दोमट मिट्टी", clay:"चिकनी मिट्टी", sandy:"रेतीली मिट्टी", silt:"गाद मिट्टी", black:"काली मिट्टी", red:"लाल मिट्टी" },
+    mr: { field: "शेताचा आकार (एकर)", soil: "मातीचा प्रकार", loamy:"दोमट माती", clay:"चिकणी माती", sandy:"वाळूची माती", silt:"गाळाची माती", black:"काळी माती", red:"लाल माती" },
+    kn: { field: "ಜಮೀನಿನ ಗಾತ್ರ (ಎಕರೆ)", soil: "ಮಣ್ಣಿನ ಪ್ರಕಾರ", loamy:"ಲೋಮಿ ಮಣ್ಣು", clay:"ಜೇಡಿ ಮಣ್ಣು", sandy:"ಮರಳು ಮಣ್ಣು", silt:"ಹೂಳು ಮಣ್ಣು", black:"ಕಪ್ಪು ಮಣ್ಣು", red:"ಕೆಂಪು ಮಣ್ಣು" },
+    te: { field: "పొలం పరిమాణం (ఎకరాలు)", soil: "నేల రకం", loamy:"లోమీ నేల", clay:"బంకమట్టి", sandy:"ఇసుక నేల", silt:"పూడిక నేల", black:"నల్ల నేల", red:"ఎర్ర నేల" },
+    ta: { field: "நில அளவு (ஏக்கர்)", soil: "மண் வகை", loamy:"வண்டல் மண்", clay:"களி மண்", sandy:"மணல் மண்", silt:"வண்டல்", black:"கருப்பு மண்", red:"சிவப்பு மண்" },
+    pa: { field: "ਖੇਤ ਦਾ ਆਕਾਰ (ਏਕੜ)", soil: "ਮਿੱਟੀ ਦੀ ਕਿਸਮ", loamy:"ਦੋਮਟ ਮਿੱਟੀ", clay:"ਚਿਕਣੀ ਮਿੱਟੀ", sandy:"ਰੇਤਲੀ ਮਿੱਟੀ", silt:"ਗਾਦ ਮਿੱਟੀ", black:"ਕਾਲੀ ਮਿੱਟੀ", red:"ਲਾਲ ਮਿੱਟੀ" },
+    bn: { field: "জমির আকার (একর)", soil: "মাটির ধরন", loamy:"দোআঁশ মাটি", clay:"এঁটেল মাটি", sandy:"বালি মাটি", silt:"পলি মাটি", black:"কালো মাটি", red:"লাল মাটি" },
+    gu: { field: "ખેતરનું કદ (એકર)", soil: "માટીનો પ્રકાર", loamy:"ગોરાડુ માટી", clay:"ચીકણી માટી", sandy:"રેતાળ માટી", silt:"ગાળ માટી", black:"કાળી માટી", red:"લાલ માટી" },
+    en: { field: "Field Size (Acres)", soil: "Soil Type", loamy:"Loamy", clay:"Clay", sandy:"Sandy", silt:"Silt", black:"Black Cotton", red:"Red Laterite" },
+  };
+
+  function updateLabels(lang) {
+    const L = LANG_LABELS[lang] || LANG_LABELS["en"];
+    document.getElementById("field-label").textContent = L.field;
+    document.getElementById("soil-label").textContent = L.soil;
+    document.getElementById("soil-loamy").textContent = L.loamy;
+    document.getElementById("soil-clay").textContent = L.clay;
+    document.getElementById("soil-sandy").textContent = L.sandy;
+    document.getElementById("soil-silt").textContent = L.silt;
+    document.getElementById("soil-black").textContent = L.black;
+    document.getElementById("soil-red").textContent = L.red;
+  }
+
+  document.getElementById("language").addEventListener("change", function() {
+    updateLabels(this.value);
+  });
+
   function getAdvisory() {
     const locationVal = document.getElementById("location").value;
     const crop = document.getElementById("crop").value;
@@ -180,12 +229,16 @@
     const locationName = document.getElementById("location").selectedOptions[0].text;
 
     // Save to session and redirect to dashboard
+    const fieldArea = parseFloat(document.getElementById("field_area").value) || 1.0;
+    const soilType  = document.getElementById("soil_type").value;
     sessionStorage.setItem("lat", lat);
     sessionStorage.setItem("lon", lon);
     sessionStorage.setItem("crop", crop);
     sessionStorage.setItem("stage", stage);
     sessionStorage.setItem("language", language);
     sessionStorage.setItem("location_name", locationName);
+    sessionStorage.setItem("field_area", fieldArea);
+    sessionStorage.setItem("soil_type", soilType);
     sessionStorage.setItem("backend_url", BACKEND_URL);
 
     window.location.href = "dashboard.html";
