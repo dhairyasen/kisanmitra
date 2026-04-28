@@ -9,6 +9,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 
 from api.models import WeatherRequest, AdvisoryRequest, FarmerRegisterRequest, ChatbotRequest
+from api.database import create_tables
+from api.farmer_router import router as farmer_router
 from ingestion.weather_fetcher import get_full_weather_context, fetch_open_meteo
 from models.risk_classifier import classify_risk, batch_classify
 from models.irrigation_model import get_irrigation_schedule
@@ -21,6 +23,7 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    create_tables()
     logger.info("🌾 KisanMitra API starting up...")
     yield
     logger.info("KisanMitra API shutting down.")
@@ -28,7 +31,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="KisanMitra — Smart Weather Intelligence for Farmers",
     description="AI-powered hyperlocal weather advisory system for Indian farmers.",
-    version="1.0.0",
+    version="2.0.0",
     lifespan=lifespan
 )
 
@@ -40,6 +43,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ── Include Routers ───────────────────────────────────────────
+app.include_router(farmer_router)
+
 # ── Health Check ──────────────────────────────────────────────
 
 @app.get("/", tags=["Health"])
@@ -47,7 +53,7 @@ def root():
     return {
         "status": "ok",
         "app": "KisanMitra",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "supported_crops": SUPPORTED_CROPS,
         "message": "Smart Weather Intelligence for Farmers 🌾"
     }
@@ -128,7 +134,6 @@ def get_full_advisory(req: AdvisoryRequest):
     lang = req.language.value if req.language else "hi"
     daily = weather.get("daily_forecast", [])
 
-    # Use translated risk classifier
     risks = []
     for day in daily:
         result = classify_risk_translated(
@@ -153,27 +158,26 @@ def get_full_advisory(req: AdvisoryRequest):
     )
     profile = get_crop_profile(req.crop.value)
 
-    # Get weather messages in selected language
     today = daily[0] if daily else {}
-    weather_msg = get_weather_message(lang, today.get("temp_max_c", 25), today.get("rainfall_mm", 0), today.get("wind_max_kmh", 0))
+    weather_msg    = get_weather_message(lang, today.get("temp_max_c", 25), today.get("rainfall_mm", 0), today.get("wind_max_kmh", 0))
     weather_advice = get_weather_advice(lang, today.get("temp_max_c", 25), today.get("rainfall_mm", 0), today.get("wind_max_kmh", 0))
-    ai_advisory = get_translation(lang, "ai_advisory")
+    ai_advisory    = get_translation(lang, "ai_advisory")
 
     return {
-        "status": "ok",
-        "crop": req.crop.value,
-        "crop_hi": profile["name_hi"],
-        "growth_stage": req.growth_stage.value,
-        "language": lang,
-        "location": {"lat": req.lat, "lon": req.lon},
-        "weather_forecast": daily,
-        "weather_message": weather_msg,
-        "weather_advice": weather_advice,
-        "ai_advisory": ai_advisory,
-        "risk_assessment": risks,
+        "status":            "ok",
+        "crop":              req.crop.value,
+        "crop_hi":           profile["name_hi"],
+        "growth_stage":      req.growth_stage.value,
+        "language":          lang,
+        "location":          {"lat": req.lat, "lon": req.lon},
+        "weather_forecast":  daily,
+        "weather_message":   weather_msg,
+        "weather_advice":    weather_advice,
+        "ai_advisory":       ai_advisory,
+        "risk_assessment":   risks,
         "irrigation_schedule": irrigation["schedule"],
-        "irrigation_summary": irrigation["summary"],
-        "alert_required": any(r.get("alert_required") for r in risks)
+        "irrigation_summary":  irrigation["summary"],
+        "alert_required":    any(r.get("alert_required") for r in risks)
     }
 
 # ── Crops Info ────────────────────────────────────────────────
@@ -192,17 +196,12 @@ def get_crop(crop_name: str):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-if __name__ == "__main__":
-    uvicorn.run("api.main:app", host=settings.app_host, port=settings.app_port, reload=settings.debug)
-
-
 # ── Chatbot Endpoint ──────────────────────────────────────────
 
 @app.post("/chatbot/query", tags=["Chatbot"])
 def chatbot_query(req: ChatbotRequest):
     """
     KisanMitra AI chatbot — ask anything about weather/crops.
-    Powers WhatsApp bot and voice assistant.
     """
     from agents.crop_advisor_agent import quick_advisory
     from config.settings import get_settings
@@ -210,7 +209,7 @@ def chatbot_query(req: ChatbotRequest):
 
     if not cfg.anthropic_api_key:
         return {
-            "status": "no_api_key",
+            "status":   "no_api_key",
             "response": "AI advisory requires ANTHROPIC_API_KEY in .env file.",
             "fallback": "Please set your API key and restart."
         }
@@ -228,8 +227,11 @@ def chatbot_query(req: ChatbotRequest):
     )
 
     return {
-        "status": "ok",
-        "query": req.message,
+        "status":   "ok",
+        "query":    req.message,
         "response": response,
         "language": req.language.value
     }
+
+if __name__ == "__main__":
+    uvicorn.run("api.main:app", host=settings.app_host, port=settings.app_port, reload=settings.debug)
