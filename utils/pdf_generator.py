@@ -16,8 +16,14 @@ logger = get_logger("pdf_generator")
 
 BASE_DIR  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONTS_DIR = os.path.join(BASE_DIR, "fonts")
-NOTO_SANS = os.path.join(FONTS_DIR, "NotoSans-Regular.ttf")
-NOTO_DEVA = os.path.join(FONTS_DIR, "NotoSansDevanagari-Regular.ttf")
+NOTO_SANS     = os.path.join(FONTS_DIR, "NotoSans-Regular.ttf")
+NOTO_DEVA     = os.path.join(FONTS_DIR, "NotoSansDevanagari-Regular.ttf")
+NOTO_GUJARATI = os.path.join(FONTS_DIR, "NotoSansGujarati-Regular.ttf")
+NOTO_TAMIL    = os.path.join(FONTS_DIR, "NotoSansTamil-Regular.ttf")
+NOTO_TELUGU   = os.path.join(FONTS_DIR, "NotoSansTelugu-Regular.ttf")
+NOTO_KANNADA  = os.path.join(FONTS_DIR, "NotoSansKannada-Regular.ttf")
+NOTO_BENGALI  = os.path.join(FONTS_DIR, "NotoSansBengali-Regular.ttf")
+NOTO_GURMUKHI = os.path.join(FONTS_DIR, "NotoSansGurmukhi-Regular.ttf")
 
 GREEN_DARK  = (26/255,  107/255, 60/255)
 GREEN_MED   = (39/255,  174/255, 96/255)
@@ -135,20 +141,70 @@ CROP_NAMES = {
 }
 
 
+def _download_fonts_if_needed():
+    """Download missing fonts from system or PyPI package."""
+    import subprocess
+    for fname in ["NotoSansGujarati-Regular.ttf", "NotoSansTamil-Regular.ttf",
+                  "NotoSansTelugu-Regular.ttf", "NotoSansKannada-Regular.ttf",
+                  "NotoSansBengali-Regular.ttf", "NotoSansGurmukhi-Regular.ttf"]:
+        dest = os.path.join(FONTS_DIR, fname)
+        if not os.path.exists(dest) or os.path.getsize(dest) < 1000:
+            # Try system fonts first
+            system_path = f"/usr/share/fonts/truetype/noto/{fname}"
+            if os.path.exists(system_path) and os.path.getsize(system_path) > 1000:
+                import shutil
+                shutil.copy(system_path, dest)
+                logger.info(f"Copied font from system: {fname}")
+            else:
+                # Try apt install
+                try:
+                    subprocess.run(["apt-get", "install", "-y", "fonts-noto"],
+                                   capture_output=True, timeout=60)
+                    if os.path.exists(system_path) and os.path.getsize(system_path) > 1000:
+                        import shutil
+                        shutil.copy(system_path, dest)
+                        logger.info(f"Installed and copied: {fname}")
+                except Exception as e:
+                    logger.warning(f"Could not install font {fname}: {e}")
+
 def _register_fonts():
+    _download_fonts_if_needed()
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
-    if os.path.exists(NOTO_SANS):
-        pdfmetrics.registerFont(TTFont("NotoSans", NOTO_SANS))
-    if os.path.exists(NOTO_DEVA):
-        pdfmetrics.registerFont(TTFont("NotoSansDevanagari", NOTO_DEVA))
+    font_map = {
+        "NotoSans":         NOTO_SANS,
+        "NotoSansDevanagari": NOTO_DEVA,
+        "NotoSansGujarati": NOTO_GUJARATI,
+        "NotoSansTamil":    NOTO_TAMIL,
+        "NotoSansTelugu":   NOTO_TELUGU,
+        "NotoSansKannada":  NOTO_KANNADA,
+        "NotoSansBengali":  NOTO_BENGALI,
+        "NotoSansGurmukhi": NOTO_GURMUKHI,
+    }
+    for name, path in font_map.items():
+        if os.path.exists(path):
+            try:
+                pdfmetrics.registerFont(TTFont(name, path))
+            except Exception:
+                pass
 
 
 def _font(language: str) -> str:
-    """Get primary font for language."""
-    deva = ["hi", "mr"]
-    if language in deva and os.path.exists(NOTO_DEVA):
-        return "NotoSansDevanagari"
+    """Get primary font for language - each script needs its own font."""
+    font_map = {
+        "hi": ("NotoSansDevanagari", NOTO_DEVA),
+        "mr": ("NotoSansDevanagari", NOTO_DEVA),
+        "gu": ("NotoSansGujarati",   NOTO_GUJARATI),
+        "ta": ("NotoSansTamil",      NOTO_TAMIL),
+        "te": ("NotoSansTelugu",     NOTO_TELUGU),
+        "kn": ("NotoSansKannada",    NOTO_KANNADA),
+        "bn": ("NotoSansBengali",    NOTO_BENGALI),
+        "pa": ("NotoSansGurmukhi",   NOTO_GURMUKHI),
+        "en": ("NotoSans",           NOTO_SANS),
+    }
+    name, path = font_map.get(language, ("NotoSans", NOTO_SANS))
+    if os.path.exists(path):
+        return name
     if os.path.exists(NOTO_SANS):
         return "NotoSans"
     return "Helvetica"
@@ -258,8 +314,8 @@ def _table(c, x, y, data, col_w, font, rh=6.5):
             try:
                 val_str.encode('ascii')
                 c.setFont(afont, 7)
-            except UnicodeEncodeError:
-                c.setFont(font, 7)
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                c.setFont(font, 6)
             c.drawString(cx+1.5*mm, ry+(rh-4)*mm, val_str)
             cx += w*mm
         c.setStrokeColorRGB(*LIGHT_GRAY)
@@ -493,9 +549,14 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     c.roundRect(mg, y-abh, cw, abh, 5, fill=1, stroke=0)
     c.setStrokeColorRGB(*GREEN_MED); c.setLineWidth(2)
     c.line(mg, y-abh, mg, y)
-    c.setFillColorRGB(*DARK); c.setFont(font,8.5)
+    c.setFillColorRGB(*DARK)
     bullet_y = y - 6*mm
     for i,line in enumerate(expanded_bullets):
+        try:
+            line.encode('ascii')
+            c.setFont(afont, 8.5)
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            c.setFont(font, 8)
         c.drawString(mg+5*mm, bullet_y, f"•  {line}")
         bullet_y -= 7*mm
     y -= abh+8*mm
@@ -510,9 +571,14 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     nth = (len(expanded_tips)*7+10)*mm
     c.setFillColorRGB(*GREEN_LIGHT)
     c.roundRect(mg, y-nth, cw, nth, 5, fill=1, stroke=0)
-    c.setFillColorRGB(*DARK); c.setFont(font,8.5)
+    c.setFillColorRGB(*DARK)
     tip_y = y - 6*mm
     for line in expanded_tips:
+        try:
+            line.encode('ascii')
+            c.setFont(afont, 8.5)
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            c.setFont(font, 8)
         c.drawString(mg+5*mm, tip_y, f"->  {line}")
         tip_y -= 7*mm
     y -= nth+10*mm
