@@ -1,6 +1,6 @@
 """
 MODULE — Database Setup
-SQLAlchemy + SQLite engine, session, and base model.
+SQLAlchemy + PostgreSQL (Supabase) engine, session, and base model.
 """
 
 import sys
@@ -16,8 +16,7 @@ logger = get_logger("database")
 settings = get_settings()
 
 engine = create_engine(
-    settings.database_url,
-    connect_args={"check_same_thread": False}  # needed for SQLite
+    settings.database_url  # PostgreSQL URL from Supabase
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

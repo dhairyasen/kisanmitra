@@ -10,20 +10,27 @@ class Settings(BaseSettings):
     open_meteo_base_url: str = "https://api.open-meteo.com/v1/forecast"
     nasa_power_url: str = "https://power.larc.nasa.gov/api/temporal/daily/point"
 
-    # Twilio
+    # Twilio (kept for future)
     twilio_account_sid: str = ""
     twilio_auth_token: str = ""
     twilio_phone: str = ""
     whatsapp_from: str = "whatsapp:+14155238886"
 
-    # Email
+    # Email (Gmail SMTP)
     smtp_host: str = "smtp.gmail.com"
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
 
-    # Database
-    database_url: str = "sqlite:///./kisanmitra.db"
+    # Fast2SMS
+    fast2sms_api_key: str = ""
+
+    # Supabase
+    supabase_url: str = ""
+    supabase_anon_key: str = ""
+
+    # Database (Supabase PostgreSQL)
+    database_url: str = ""
 
     # App
     app_host: str = "0.0.0.0"
