@@ -19,7 +19,6 @@ from models.risk_classifier import batch_classify
 from models.irrigation_model import get_irrigation_schedule
 from agents.alert_composer import compose_daily_briefing
 from delivery.alert_router import route_alert
-from delivery.whatsapp_bot import send_whatsapp_text
 from utils.logger import get_logger
 from config.settings import get_settings
 
@@ -60,8 +59,9 @@ def run_morning_briefing():
 
             message = compose_daily_briefing(crop, risks, today_irrigation, farmer.get("language", "hi"))
 
-            if farmer.get("whatsapp"):
-                send_whatsapp_text(farmer["phone"], message)
+            # WhatsApp alerts - disabled (Twilio not configured)
+            # if farmer.get("whatsapp"):
+            #     send_whatsapp_text(farmer["phone"], message)
 
             logger.info(f"Morning briefing sent to {farmer['name']}")
 
