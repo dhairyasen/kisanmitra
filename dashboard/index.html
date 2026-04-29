@@ -75,9 +75,22 @@
 
       <div class="space-y-4">
         <!-- Location -->
-        <div>
+        <div class="relative">
           <label class="block text-sm font-semibold text-gray-600 mb-1">Apna Shehar/Zila Chunein</label>
-          <select id="location" class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-green-300 outline-none">
+          <div class="relative">
+            <input type="text" id="city-search" placeholder="Search or select city..." autocomplete="off"
+              class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-green-300 outline-none cursor-pointer"
+              onclick="toggleCityDropdown()" oninput="filterCities(this.value)" />
+            <span class="absolute right-3 top-3 text-gray-400 pointer-events-none material-symbols-outlined">expand_more</span>
+          </div>
+          <div id="city-dropdown" class="hidden absolute z-50 w-full bg-white border border-gray-200 rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto">
+            <div id="city-list">
+              <!-- populated by JS -->
+            </div>
+          </div>
+          <input type="hidden" id="location" value="" />
+          <div class="hidden">
+          <select id="location-select" class="w-full h-12 px-4 bg-white border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-green-300 outline-none">
             <option value="">Select Location</option>
             <option value="19.076,72.877">Mumbai</option>
             <option value="28.613,77.209">Delhi</option>
@@ -94,7 +107,44 @@
             <option value="23.022,72.571">Ahmedabad</option>
             <option value="17.385,78.486">Hyderabad</option>
             <option value="13.082,80.270">Chennai</option>
+            <option value="12.971,77.594">Bangalore</option>
+            <option value="19.997,73.789">Nashik</option>
+            <option value="20.937,77.775">Amravati</option>
+            <option value="27.180,78.008">Agra</option>
+            <option value="25.317,83.010">Varanasi</option>
+            <option value="26.449,80.331">Kanpur</option>
+            <option value="28.204,83.996">Gorakhpur</option>
+            <option value="24.585,73.712">Udaipur</option>
+            <option value="25.435,81.846">Allahabad</option>
+            <option value="23.344,85.309">Ranchi</option>
+            <option value="20.272,85.840">Bhubaneswar</option>
+            <option value="26.184,91.746">Guwahati</option>
+            <option value="11.127,78.656">Coimbatore</option>
+            <option value="9.931,76.267">Kochi</option>
+            <option value="8.524,76.936">Thiruvananthapuram</option>
+            <option value="15.317,75.714">Hubli</option>
+            <option value="16.704,74.243">Kolhapur</option>
+            <option value="19.674,75.300">Aurangabad</option>
+            <option value="21.251,81.629">Raipur</option>
+            <option value="23.834,91.279">Agartala</option>
+            <option value="11.664,78.146">Salem</option>
+            <option value="10.790,79.132">Thanjavur</option>
+            <option value="27.467,94.912">Dibrugarh</option>
+            <option value="31.634,74.872">Amritsar</option>
+            <option value="30.901,75.857">Ludhiana</option>
+            <option value="29.386,76.984">Karnal</option>
+            <option value="28.459,77.026">Gurugram</option>
+            <option value="24.179,72.433">Palanpur</option>
+            <option value="22.303,70.802">Rajkot</option>
+            <option value="22.470,70.057">Jamnagar</option>
+            <option value="26.296,73.017">Jodhpur</option>
+            <option value="27.609,75.144">Sikar</option>
+            <option value="23.179,77.379">Sehore</option>
+            <option value="22.884,78.047">Hoshangabad</option>
+            <option value="24.529,80.829">Satna</option>
+            <option value="23.833,78.744">Sagar</option>
           </select>
+          </div>
         </div>
 
         <!-- Crop -->
@@ -226,7 +276,7 @@
     }
 
     const [lat, lon] = locationVal.split(",");
-    const locationName = document.getElementById("location").selectedOptions[0].text;
+    const locationName = document.getElementById("city-search").value || "Unknown";
 
     // Save to session and redirect to dashboard
     const fieldArea = parseFloat(document.getElementById("field_area").value) || 1.0;
@@ -243,6 +293,57 @@
 
     window.location.href = "dashboard.html";
   }
+</script>
+
+<script>
+// ── Searchable City Dropdown ──────────────────────────────
+const CITIES = Array.from(document.getElementById("location-select").options)
+  .filter(o => o.value)
+  .map(o => ({ value: o.value, name: o.text }));
+
+function renderCityList(cities) {
+  const list = document.getElementById("city-list");
+  if (cities.length === 0) {
+    list.innerHTML = '<div class="px-4 py-3 text-gray-400 text-sm">No city found</div>';
+    return;
+  }
+  list.innerHTML = cities.map(c =>
+    `<div class="px-4 py-3 hover:bg-green-50 cursor-pointer text-sm text-gray-800 border-b border-gray-50"
+      onclick="selectCity('${c.value}', '${c.name}')">${c.name}</div>`
+  ).join("");
+}
+
+function toggleCityDropdown() {
+  const dd = document.getElementById("city-dropdown");
+  if (dd.classList.contains("hidden")) {
+    renderCityList(CITIES);
+    dd.classList.remove("hidden");
+  } else {
+    dd.classList.add("hidden");
+  }
+}
+
+function filterCities(query) {
+  const dd = document.getElementById("city-dropdown");
+  dd.classList.remove("hidden");
+  const filtered = CITIES.filter(c => c.name.toLowerCase().includes(query.toLowerCase()));
+  renderCityList(filtered);
+  document.getElementById("location").value = "";
+}
+
+function selectCity(value, name) {
+  document.getElementById("location").value = value;
+  document.getElementById("city-search").value = name;
+  document.getElementById("city-dropdown").classList.add("hidden");
+}
+
+document.addEventListener("click", function(e) {
+  const search = document.getElementById("city-search");
+  const dd = document.getElementById("city-dropdown");
+  if (search && dd && !search.contains(e.target) && !dd.contains(e.target)) {
+    dd.classList.add("hidden");
+  }
+});
 </script>
 </body>
 </html>
