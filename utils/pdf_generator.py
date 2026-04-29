@@ -120,15 +120,155 @@ LABELS = {
     },
 }
 
-for lang in ["kn", "te", "ta", "pa", "bn", "gu"]:
-    LABELS[lang] = LABELS["en"].copy()
+# Kannada
+LABELS["kn"] = LABELS["en"].copy()
+LABELS["kn"].update({
+    "language_name": "Kannada",
+    "title": "KisanMitra — ವಾರದ ಕೃಷಿ ವರದಿ",
+    "farmer": "ರೈತ", "district": "ಜಿಲ್ಲೆ", "crop": "ಬೆಳೆ",
+    "field": "ಜಮೀನು", "stage": "ಹಂತ", "soil": "ಮಣ್ಣು", "week": "ವಾರ",
+    "weather": "ಹವಾಮಾನ ಸಾರಾಂಶ", "min_temp": "ಕನಿಷ್ಠ ತಾಪಮಾನ",
+    "max_temp": "ಗರಿಷ್ಠ ತಾಪಮಾನ", "rainfall": "ಒಟ್ಟು ಮಳೆ",
+    "key_events": "ಪ್ರಮುಖ ಘಟನೆಗಳು", "forecast": "7 ದಿನಗಳ ಮುನ್ಸೂಚನೆ",
+    "risk": "ಬೆಳೆ ಅಪಾಯ ವರದಿ", "overall_risk": "ಈ ವಾರದ ಅಪಾಯ",
+    "lstm": "ಮುಂದಿನ ವಾರ ಮಳೆ ಮುನ್ಸೂಚನೆ (AI)",
+    "irrigation": "ನೀರಾವರಿ ಶಿಫಾರಸು", "irr_days": "ನೀರಾವರಿ ದಿನಗಳು",
+    "skip_days": "ಬಿಟ್ಟ ದಿನಗಳು", "total_water": "ಒಟ್ಟು ನೀರು",
+    "advisory": "AI ಸಲಹೆ — ಈ ವಾರ", "next_week": "ಮುಂದಿನ ವಾರದ ಸಲಹೆ",
+    "disclaimer": "ಈ ವರದಿ ಉಪಗ್ರಹ ಹವಾಮಾನ ಡೇಟಾ ಆಧಾರಿತವಾಗಿದೆ.",
+    "date_col": "ದಿನಾಂಕ", "temp_col": "ತಾಪಮಾನ", "rain_col": "ಮಳೆ",
+    "wind_col": "ಗಾಳಿ", "risk_col": "ಅಪಾಯ", "reason_col": "ಕಾರಣ",
+    "decision_col": "ನಿರ್ಧಾರ", "liters_col": "ನೀರು(L)",
+    "irrigate": "ನೀರಾವರಿ ಮಾಡಿ", "skip": "ಬಿಡಿ", "reduce": "ಕಡಿಮೆ ಮಾಡಿ",
+    "h24": "24 ಗಂಟೆ", "h48": "48 ಗಂಟೆ", "h72": "72 ಗಂಟೆ",
+    "acres": "ಎಕರೆ", "page": "ಪುಟ", "of": "ರಲ್ಲಿ",
+    "generated": "KisanMitra AI ರಿಂದ ರಚಿಸಲಾಗಿದೆ", "next_report": "ಮುಂದಿನ ವರದಿ",
+})
 
-LABELS["kn"]["language_name"] = "Kannada"
-LABELS["te"]["language_name"] = "Telugu"
-LABELS["ta"]["language_name"] = "Tamil"
-LABELS["pa"]["language_name"] = "Punjabi"
-LABELS["bn"]["language_name"] = "Bengali"
-LABELS["gu"]["language_name"] = "Gujarati"
+# Telugu
+LABELS["te"] = LABELS["en"].copy()
+LABELS["te"].update({
+    "language_name": "Telugu",
+    "title": "KisanMitra — వారపు వ్యవసాయ నివేదిక",
+    "farmer": "రైతు", "district": "జిల్లా", "crop": "పంట",
+    "field": "పొలం", "stage": "దశ", "soil": "నేల", "week": "వారం",
+    "weather": "వాతావరణ సారాంశం", "min_temp": "కనిష్ట ఉష్ణోగ్రత",
+    "max_temp": "గరిష్ట ఉష్ణోగ్రత", "rainfall": "మొత్తం వర్షపాతం",
+    "key_events": "ముఖ్య సంఘటనలు", "forecast": "7 రోజుల అంచనా",
+    "risk": "పంట రిస్క్ నివేదిక", "overall_risk": "ఈ వారం రిస్క్",
+    "lstm": "వచ్చే వారం వర్షపాతం అంచనా (AI)",
+    "irrigation": "నీటిపారుదల సిఫార్సు", "irr_days": "నీటిపారుదల రోజులు",
+    "skip_days": "వదిలిన రోజులు", "total_water": "మొత్తం నీరు",
+    "advisory": "AI సలహా — ఈ వారం", "next_week": "వచ్చే వారం చిట్కాలు",
+    "disclaimer": "ఈ నివేదిక ఉపగ్రహ వాతావరణ డేటా ఆధారంగా ఉంది.",
+    "date_col": "తేదీ", "temp_col": "ఉష్ణోగ్రత", "rain_col": "వర్షం",
+    "wind_col": "గాలి", "risk_col": "రిస్క్", "reason_col": "కారణం",
+    "decision_col": "నిర్ణయం", "liters_col": "నీరు(L)",
+    "irrigate": "నీరు పెట్టండి", "skip": "వదలండి", "reduce": "తగ్గించండి",
+    "h24": "24 గంటలు", "h48": "48 గంటలు", "h72": "72 గంటలు",
+    "acres": "ఎకరాలు", "page": "పేజీ", "of": "లో",
+    "generated": "KisanMitra AI రూపొందించింది", "next_report": "తదుపరి నివేదిక",
+})
+
+# Tamil
+LABELS["ta"] = LABELS["en"].copy()
+LABELS["ta"].update({
+    "language_name": "Tamil",
+    "title": "KisanMitra — வாராந்திர வேளாண் அறிக்கை",
+    "farmer": "விவசாயி", "district": "மாவட்டம்", "crop": "பயிர்",
+    "field": "வயல்", "stage": "நிலை", "soil": "மண்", "week": "வாரம்",
+    "weather": "வானிலை சுருக்கம்", "min_temp": "குறைந்த வெப்பநிலை",
+    "max_temp": "அதிக வெப்பநிலை", "rainfall": "மொத்த மழை",
+    "key_events": "முக்கிய நிகழ்வுகள்", "forecast": "7 நாள் முன்னறிவிப்பு",
+    "risk": "பயிர் அபாய அறிக்கை", "overall_risk": "இந்த வார அபாயம்",
+    "lstm": "அடுத்த வார மழை முன்னறிவிப்பு (AI)",
+    "irrigation": "நீர்ப்பாசன பரிந்துரை", "irr_days": "நீர்ப்பாசன நாட்கள்",
+    "skip_days": "தவிர்த்த நாட்கள்", "total_water": "மொத்த நீர்",
+    "advisory": "AI ஆலோசனை — இந்த வாரம்", "next_week": "அடுத்த வார குறிப்புகள்",
+    "disclaimer": "இந்த அறிக்கை செயற்கைக்கோள் தரவை அடிப்படையாகக் கொண்டது.",
+    "date_col": "தேதி", "temp_col": "வெப்பம்", "rain_col": "மழை",
+    "wind_col": "காற்று", "risk_col": "அபாயம்", "reason_col": "காரணம்",
+    "decision_col": "முடிவு", "liters_col": "நீர்(L)",
+    "irrigate": "நீர் பாய்ச்சுங்கள்", "skip": "தவிர்க்கவும்", "reduce": "குறைக்கவும்",
+    "h24": "24 மணி", "h48": "48 மணி", "h72": "72 மணி",
+    "acres": "ஏக்கர்", "page": "பக்கம்", "of": "இல்",
+    "generated": "KisanMitra AI உருவாக்கியது", "next_report": "அடுத்த அறிக்கை",
+})
+
+# Punjabi
+LABELS["pa"] = LABELS["en"].copy()
+LABELS["pa"].update({
+    "language_name": "Punjabi",
+    "title": "KisanMitra — ਹਫ਼ਤਾਵਾਰੀ ਖੇਤੀ ਰਿਪੋਰਟ",
+    "farmer": "ਕਿਸਾਨ", "district": "ਜ਼ਿਲ੍ਹਾ", "crop": "ਫ਼ਸਲ",
+    "field": "ਖੇਤ", "stage": "ਅਵਸਥਾ", "soil": "ਮਿੱਟੀ", "week": "ਹਫ਼ਤਾ",
+    "weather": "ਮੌਸਮ ਸਾਰਾਂਸ਼", "min_temp": "ਘੱਟੋ-ਘੱਟ ਤਾਪਮਾਨ",
+    "max_temp": "ਵੱਧ ਤੋਂ ਵੱਧ ਤਾਪਮਾਨ", "rainfall": "ਕੁੱਲ ਵਰਖਾ",
+    "key_events": "ਮੁੱਖ ਘਟਨਾਵਾਂ", "forecast": "7 ਦਿਨਾਂ ਦਾ ਅਨੁਮਾਨ",
+    "risk": "ਫ਼ਸਲ ਖ਼ਤਰਾ ਰਿਪੋਰਟ", "overall_risk": "ਇਸ ਹਫ਼ਤੇ ਦਾ ਖ਼ਤਰਾ",
+    "lstm": "ਅਗਲੇ ਹਫ਼ਤੇ ਵਰਖਾ ਅਨੁਮਾਨ (AI)",
+    "irrigation": "ਸਿੰਚਾਈ ਸਿਫ਼ਾਰਸ਼", "irr_days": "ਸਿੰਚਾਈ ਦਿਨ",
+    "skip_days": "ਬੰਦ ਦਿਨ", "total_water": "ਕੁੱਲ ਪਾਣੀ",
+    "advisory": "AI ਸਲਾਹ — ਇਸ ਹਫ਼ਤੇ", "next_week": "ਅਗਲੇ ਹਫ਼ਤੇ ਲਈ ਸੁਝਾਅ",
+    "disclaimer": "ਇਹ ਰਿਪੋਰਟ ਉਪਗ੍ਰਹਿ ਮੌਸਮ ਡੇਟਾ 'ਤੇ ਆਧਾਰਿਤ ਹੈ।",
+    "date_col": "ਤਾਰੀਖ਼", "temp_col": "ਤਾਪਮਾਨ", "rain_col": "ਵਰਖਾ",
+    "wind_col": "ਹਵਾ", "risk_col": "ਖ਼ਤਰਾ", "reason_col": "ਕਾਰਨ",
+    "decision_col": "ਫ਼ੈਸਲਾ", "liters_col": "ਪਾਣੀ(L)",
+    "irrigate": "ਸਿੰਚਾਈ ਕਰੋ", "skip": "ਬੰਦ ਰੱਖੋ", "reduce": "ਘੱਟ ਕਰੋ",
+    "h24": "24 ਘੰਟੇ", "h48": "48 ਘੰਟੇ", "h72": "72 ਘੰਟੇ",
+    "acres": "ਏਕੜ", "page": "ਪੰਨਾ", "of": "ਦਾ",
+    "generated": "KisanMitra AI ਦੁਆਰਾ ਤਿਆਰ", "next_report": "ਅਗਲੀ ਰਿਪੋਰਟ",
+})
+
+# Bengali
+LABELS["bn"] = LABELS["en"].copy()
+LABELS["bn"].update({
+    "language_name": "Bengali",
+    "title": "KisanMitra — সাপ্তাহিক কৃষি রিপোর্ট",
+    "farmer": "কৃষক", "district": "জেলা", "crop": "ফসল",
+    "field": "জমি", "stage": "পর্যায়", "soil": "মাটি", "week": "সপ্তাহ",
+    "weather": "আবহাওয়া সারসংক্ষেপ", "min_temp": "সর্বনিম্ন তাপমাত্রা",
+    "max_temp": "সর্বোচ্চ তাপমাত্রা", "rainfall": "মোট বৃষ্টিপাত",
+    "key_events": "প্রধান ঘটনাসমূহ", "forecast": "৭ দিনের পূর্বাভাস",
+    "risk": "ফসল ঝুঁকি রিপোর্ট", "overall_risk": "এই সপ্তাহের ঝুঁকি",
+    "lstm": "পরবর্তী সপ্তাহ বৃষ্টি পূর্বাভাস (AI)",
+    "irrigation": "সেচ সুপারিশ", "irr_days": "সেচ দিন",
+    "skip_days": "বাদ দিন", "total_water": "মোট পানি",
+    "advisory": "AI পরামর্শ — এই সপ্তাহ", "next_week": "আগামী সপ্তাহের পরামর্শ",
+    "disclaimer": "এই রিপোর্ট স্যাটেলাইট আবহাওয়া ডেটার উপর ভিত্তি করে।",
+    "date_col": "তারিখ", "temp_col": "তাপমাত্রা", "rain_col": "বৃষ্টি",
+    "wind_col": "বায়ু", "risk_col": "ঝুঁকি", "reason_col": "কারণ",
+    "decision_col": "সিদ্ধান্ত", "liters_col": "পানি(L)",
+    "irrigate": "সেচ দিন", "skip": "বাদ দিন", "reduce": "কমান",
+    "h24": "২৪ ঘণ্টা", "h48": "৪৮ ঘণ্টা", "h72": "৭২ ঘণ্টা",
+    "acres": "একর", "page": "পাতা", "of": "এর",
+    "generated": "KisanMitra AI দ্বারা তৈরি", "next_report": "পরবর্তী রিপোর্ট",
+})
+
+# Gujarati
+LABELS["gu"] = LABELS["en"].copy()
+LABELS["gu"].update({
+    "language_name": "Gujarati",
+    "title": "KisanMitra — સાપ્તાહિક કૃષિ અહેવાલ",
+    "farmer": "ખેડૂત", "district": "જિલ્લો", "crop": "પાક",
+    "field": "ખેતર", "stage": "તબક્કો", "soil": "માટી", "week": "અઠવાડિયું",
+    "weather": "હવામાન સારાંશ", "min_temp": "ન્યૂનતમ તાપમાન",
+    "max_temp": "મહત્તમ તાપમાન", "rainfall": "કુલ વરસાદ",
+    "key_events": "મુખ્ય ઘટનાઓ", "forecast": "7 દિવસની આગાહી",
+    "risk": "પાક જોખમ અહેવાલ", "overall_risk": "આ અઠવાડિયાનું જોખમ",
+    "lstm": "આગામી અઠવાડિયે વરસાદ આગાહી (AI)",
+    "irrigation": "સિંચાઈ ભલામણ", "irr_days": "સિંચાઈ દિવસો",
+    "skip_days": "બંધ દિવસો", "total_water": "કુલ પાણી",
+    "advisory": "AI સલાહ — આ અઠવાડિયે", "next_week": "આગામી અઠવાડિયા માટે સૂચનો",
+    "disclaimer": "આ અહેવાલ સેટેલાઇટ હવામાન ડેટા પર આધારિત છે.",
+    "date_col": "તારીખ", "temp_col": "તાપમાન", "rain_col": "વરસાદ",
+    "wind_col": "પવન", "risk_col": "જોખમ", "reason_col": "કારણ",
+    "decision_col": "નિર્ણય", "liters_col": "પાણી(L)",
+    "irrigate": "સિંચાઈ કરો", "skip": "બંધ રાખો", "reduce": "ઓછું કરો",
+    "h24": "24 કલાક", "h48": "48 કલાક", "h72": "72 કલાક",
+    "acres": "એકર", "page": "પૃષ્ઠ", "of": "નો",
+    "generated": "KisanMitra AI દ્વારા તૈયાર", "next_report": "આગામી અહેવાલ",
+})
 
 CROP_NAMES = {
     "wheat":     {"hi":"गेहूं","mr":"गहू","en":"Wheat","kn":"Wheat","te":"Wheat","ta":"Wheat","pa":"Wheat","bn":"গম","gu":"ઘઉં"},
