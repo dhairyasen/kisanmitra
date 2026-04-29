@@ -630,8 +630,8 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
         elif dec=="SKIP": skd+=1
         totl += vol
         dl = L.get("irrigate" if dec=="IRRIGATE" else "skip" if dec=="SKIP" else "reduce", dec)
-        itbl.append([s.get("date","")[:10], dl, f"{vol:.0f}L", s.get("reason","")[:26]])
-    _table(c, mg, y, itbl, [26,24,20,64], font)
+        itbl.append([s.get("date","")[:10], dl, f"{vol:.0f}L", s.get("reason","")[:32]])
+    _table(c, mg, y, itbl, [24,22,18,70], font)
     y -= (len(itbl)+1)*6.5*mm+8*mm
 
     for i,(val,lbl) in enumerate([(str(ird),L["irr_days"]),(str(skd),L["skip_days"]),(f"{totl:.0f}L",L["total_water"])]):
@@ -722,7 +722,7 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
         wrapped = wrap_text(b, 72)
         expanded_bullets.extend(wrapped[:4])  # max 4 lines per bullet
 
-    abh = (len(expanded_bullets)*7+10)*mm
+    abh = (len(expanded_bullets)*6.5+10)*mm
     c.setFillColorRGB(*GREEN_LIGHT)
     c.roundRect(mg, y-abh, cw, abh, 5, fill=1, stroke=0)
     c.setStrokeColorRGB(*GREEN_MED); c.setLineWidth(2)
@@ -732,11 +732,11 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     for i,line in enumerate(expanded_bullets):
         try:
             line.encode('ascii')
-            c.setFont(afont, 8.5)
+            c.setFont(afont, 8)
         except (UnicodeEncodeError, UnicodeDecodeError):
-            c.setFont(font, 8)
+            c.setFont(font, 7.5)
         c.drawString(mg+5*mm, bullet_y, f"•  {line}")
-        bullet_y -= 7*mm
+        bullet_y -= 6.5*mm
     y -= abh+8*mm
 
     _section(c, mg, y, cw, f"  {L['next_week']}", font)
@@ -746,7 +746,7 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
         wrapped = wrap_text(t, 72)
         expanded_tips.extend(wrapped[:4])
 
-    nth = (len(expanded_tips)*7+10)*mm
+    nth = (len(expanded_tips)*6.5+10)*mm
     c.setFillColorRGB(*GREEN_LIGHT)
     c.roundRect(mg, y-nth, cw, nth, 5, fill=1, stroke=0)
     c.setFillColorRGB(*DARK)
@@ -754,11 +754,11 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     for line in expanded_tips:
         try:
             line.encode('ascii')
-            c.setFont(afont, 8.5)
+            c.setFont(afont, 8)
         except (UnicodeEncodeError, UnicodeDecodeError):
-            c.setFont(font, 8)
+            c.setFont(font, 7.5)
         c.drawString(mg+5*mm, tip_y, f"->  {line}")
-        tip_y -= 7*mm
+        tip_y -= 6.5*mm
     y -= nth+10*mm
 
     # Emergency
