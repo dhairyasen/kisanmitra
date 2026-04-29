@@ -663,30 +663,53 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
         sentences = re.split(r'[।\.!]', advisory)
         adv_raw = [s.strip() for s in sentences if s.strip() and len(s.strip()) > 10]
     
-    adv_bullets = adv_raw[:4] or ["Monitor your crop daily", "Check weather updates", "Irrigate in morning", "Consult local Krishi Kendra"]
-    next_tips   = adv_raw[4:6] if len(adv_raw) > 4 else ["Check weather forecast daily", "Consult local Krishi Kendra if needed"]
+    DEFAULT_BULLETS = {
+        "hi": ["फसल की नियमित निगरानी करें", "मौसम की जानकारी लेते रहें", "सुबह सिंचाई करें", "स्थानीय कृषि केंद्र से परामर्श लें"],
+        "mr": ["पिकाची नियमित तपासणी करा", "हवामान माहिती घ्या", "सकाळी सिंचन करा", "स्थानिक कृषी केंद्राशी संपर्क करा"],
+        "gu": ["પાકની નિયમિત દેખભાળ કરો", "હવામાન માહિતી મેળવો", "સવારે સિંચાઈ કરો", "સ્થાનિક કૃષિ કેન્દ્રનો સંપર્ક કરો"],
+        "ta": ["பயிரை தினமும் கவனியுங்கள்", "வானிலை தகவல் பெறுங்கள்", "காலை நீர் பாய்ச்சுங்கள்", "உள்ளூர் வேளாண் மையத்தை தொடர்பு கொள்ளுங்கள்"],
+        "te": ["పంటను నిత్యం చూసుకోండి", "వాతావరణ సమాచారం తెలుసుకోండి", "ఉదయం నీరు పెట్టండి", "స్థానిక వ్యవసాయ కేంద్రాన్ని సంప్రదించండి"],
+        "kn": ["ಬೆಳೆಯನ್ನು ನಿತ್ಯ ಗಮನಿಸಿ", "ಹವಾಮಾನ ಮಾಹಿತಿ ಪಡೆಯಿರಿ", "ಬೆಳಿಗ್ಗೆ ನೀರು ಹಾಕಿ", "ಸ್ಥಳೀಯ ಕೃಷಿ ಕೇಂದ್ರ ಸಂಪರ್ಕಿಸಿ"],
+        "pa": ["ਫ਼ਸਲ ਦੀ ਰੋਜ਼ਾਨਾ ਨਿਗਰਾਨੀ ਕਰੋ", "ਮੌਸਮ ਦੀ ਜਾਣਕਾਰੀ ਲਓ", "ਸਵੇਰੇ ਸਿੰਚਾਈ ਕਰੋ", "ਸਥਾਨਕ ਕ੍ਰਿਸ਼ੀ ਕੇਂਦਰ ਨਾਲ ਸੰਪਰਕ ਕਰੋ"],
+        "bn": ["ফসলের প্রতিদিন পর্যবেক্ষণ করুন", "আবহাওয়ার তথ্য নিন", "সকালে সেচ দিন", "স্থানীয় কৃষি কেন্দ্রের সাথে যোগাযোগ করুন"],
+        "en": ["Monitor your crop daily", "Check weather updates", "Irrigate in morning", "Consult local Krishi Kendra"],
+    }
+    DEFAULT_TIPS = {
+        "hi": ["अगले सप्ताह मौसम का पूर्वानुमान देखें", "स्थानीय कृषि विशेषज्ञ से सलाह लें"],
+        "mr": ["पुढील आठवड्यात हवामानाचा अंदाज पहा", "स्थानिक कृषी तज्ञाचा सल्ला घ्या"],
+        "gu": ["આગામી અઠવાડિયે હવામાન આગાહી જુઓ", "સ્થાનિક કૃષિ નિષ્ણાતની સલાહ લો"],
+        "ta": ["அடுத்த வாரம் வானிலை முன்னறிவிப்பு பாருங்கள்", "உள்ளூர் வேளாண் நிபுணரிடம் ஆலோசனை பெறுங்கள்"],
+        "te": ["వచ్చే వారం వాతావరణ అంచనా చూడండి", "స్థానిక వ్యవసాయ నిపుణుడిని సంప్రదించండి"],
+        "kn": ["ಮುಂದಿನ ವಾರ ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ ನೋಡಿ", "ಸ್ಥಳೀಯ ಕೃಷಿ ತಜ್ಞರನ್ನು ಸಂಪರ್ಕಿಸಿ"],
+        "pa": ["ਅਗਲੇ ਹਫ਼ਤੇ ਮੌਸਮ ਦਾ ਅਨੁਮਾਨ ਦੇਖੋ", "ਸਥਾਨਕ ਕ੍ਰਿਸ਼ੀ ਮਾਹਰ ਨਾਲ ਸਲਾਹ ਕਰੋ"],
+        "bn": ["আগামী সপ্তাহের আবহাওয়া পূর্বাভাস দেখুন", "স্থানীয় কৃষি বিশেষজ্ঞের পরামর্শ নিন"],
+        "en": ["Check weather forecast daily", "Consult local Krishi Kendra if needed"],
+    }
+    adv_bullets = adv_raw[:4] or DEFAULT_BULLETS.get(language, DEFAULT_BULLETS["en"])
+    next_tips   = adv_raw[4:6] if len(adv_raw) > 4 else DEFAULT_TIPS.get(language, DEFAULT_TIPS["en"])
 
     y -= 6*mm
     _section(c, mg, y, cw, f"  {L['advisory']}", font)
     y -= 8*mm
     # Word wrap long advisory lines (Unicode-safe)
-    def wrap_text(text, max_chars=40):
-        """Unicode-safe wrap: use character count not byte count"""
+    def wrap_text(text, max_chars=32):
+        """Unicode-safe wrap: conservative char limit for Indic scripts"""
         words = text.split()
         lines = []
         current = ""
         for word in words:
-            # Use len() on string directly - Python 3 counts chars not bytes
             test = current + " " + word if current else word
             if len(test) <= max_chars:
                 current = test
             else:
                 if current:
                     lines.append(current)
-                # If single word is too long, split it
                 if len(word) > max_chars:
-                    lines.append(word[:max_chars])
-                    current = word[max_chars:]
+                    # Split long words
+                    while len(word) > max_chars:
+                        lines.append(word[:max_chars])
+                        word = word[max_chars:]
+                    current = word
                 else:
                     current = word
         if current:
@@ -697,7 +720,7 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     expanded_bullets = []
     for b in adv_bullets:
         wrapped = wrap_text(b, 72)
-        expanded_bullets.extend(wrapped[:3])  # max 3 lines per bullet
+        expanded_bullets.extend(wrapped[:4])  # max 4 lines per bullet
 
     abh = (len(expanded_bullets)*7+10)*mm
     c.setFillColorRGB(*GREEN_LIGHT)
@@ -721,7 +744,7 @@ def generate_pdf(farmer: dict, weather: dict, risks: list, irrigation: dict,
     expanded_tips = []
     for t in next_tips:
         wrapped = wrap_text(t, 72)
-        expanded_tips.extend(wrapped[:3])
+        expanded_tips.extend(wrapped[:4])
 
     nth = (len(expanded_tips)*7+10)*mm
     c.setFillColorRGB(*GREEN_LIGHT)
