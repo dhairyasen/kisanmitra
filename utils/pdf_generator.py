@@ -237,7 +237,12 @@ def _draw_header(c, W, H, farmer, language, week_num, now, L, font):
     c.setFillColorRGB(*WHITE)
     c.setFont(afont, 18)
     c.drawString(14*mm, H - 13*mm, "* KisanMitra")
-    c.setFont(font, 9)
+    # Title uses language font, but fallback to afont if title is ASCII
+    try:
+        L["title"].encode('ascii')
+        c.setFont(afont, 9)
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        c.setFont(font, 9)
     c.drawString(14*mm, H - 19*mm, L["title"])
 
     c.setFillColorRGB(1,1,1,0.2)
@@ -271,17 +276,27 @@ def _draw_header(c, W, H, farmer, language, week_num, now, L, font):
         c.setFillColorRGB(1,1,1,0.15)
         c.roundRect(bx, by - bh + 2*mm, bw - 2*mm, bh, 3, fill=1, stroke=0)
         c.setFillColorRGB(1,1,1,0.7)
-        c.setFont(afont, 6)
-        c.drawString(bx + 2*mm, by - 2.5*mm, str(lbl).upper()[:20])
+        # Label (like FARMER, ID etc) - use language font if non-ASCII
+        lbl_str = str(lbl).upper()[:20]
+        try:
+            lbl_str.encode('ascii')
+            c.setFont(afont, 6)
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            c.setFont(font, 5)
+        c.drawString(bx + 2*mm, by - 2.5*mm, lbl_str)
         c.setFillColorRGB(*WHITE)
-        c.setFont(afont if use_ascii else font, 8)
+        c.setFont(afont, 8)
         c.drawString(bx + 2*mm, by - 7.5*mm, str(val)[:34])
 
 
 def _section(c, x, y, w, title, font):
     from reportlab.lib.units import mm
     c.setFillColorRGB(*GREEN_DARK)
-    c.setFont(font, 11)
+    try:
+        title.encode('ascii')
+        c.setFont(font, 11)
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        c.setFont(font, 10)
     c.drawString(x, y, title)
     c.setStrokeColorRGB(*GREEN_MED)
     c.setLineWidth(1.5)
